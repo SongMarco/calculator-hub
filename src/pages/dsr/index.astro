@@ -1,0 +1,143 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Faq from '../../components/Faq.astro';
+
+const faqs = [
+  {
+    q: '스트레스 DSR이 뭔가요?',
+    a: '대출 한도를 정할 때 실제 금리가 아닌, 스트레스 금리를 가산한 금리로 DSR을 계산하는 제도입니다. 금리가 올라도 감당할 수 있는지 미리 따져보는 취지입니다. 2026년 하반기 기준 수도권·규제지역 주담대는 3.0%p가 가산됩니다.',
+  },
+  {
+    q: 'DSR 40%를 넘으면 대출이 안 나오나요?',
+    a: '은행권은 총대출 1억원 초과 차주에 대해 DSR 40%를 적용합니다. 넘으면 한도가 줄어들거나 대출이 거절될 수 있습니다. 다만 정책대출(디딤돌·버팀목 등)은 별도 기준이 적용될 수 있습니다.',
+  },
+  {
+    q: 'DSR을 낮추는 방법이 있나요?',
+    a: '기존 대출을 먼저 상환하거나(특히 신용대출), 만기를 길게 잡거나, 고정금리로 바꾸면(스트레스 금리 완화) DSR이 낮아집니다. 연소득 증빙을 늘리는 것도 방법입니다.',
+  },
+  {
+    q: '전세자금대출도 DSR에 포함되나요?',
+    a: '네. 전세자금대출의 이자 상환액도 DSR 계산에 포함됩니다. 다만 이자만 내는 구조라 원리금 대출보다 부담은 작습니다.',
+  },
+  {
+    q: '신용대출은 어떻게 계산되나요?',
+    a: 'DSR 산정 시 신용대출은 만기 5년의 분할상환으로 간주해 연간 원리금을 환산합니다. 실제 만기와 무관하게 보수적으로 계산되므로 한도에 불리하게 작용할 수 있습니다.',
+  },
+];
+---
+<BaseLayout
+  title="DSR·스트레스 DSR 계산기"
+  description="내 대출의 DSR과 스트레스 금리를 적용한 DSR을 계산해 대출 한도 가능 여부를 확인하세요. 2026년 스트레스 금리 기준 반영."
+  keywords="DSR 계산기, 스트레스 DSR, DSR 40%, 주택담보대출 한도"
+  path="/dsr/"
+>
+  <p class="breadcrumb"><a href="/">홈</a> &gt; DSR 계산기</p>
+  <h1 class="page-title">DSR · 스트레스 DSR 계산기</h1>
+  <p class="page-desc">연소득과 대출 조건을 입력하면 DSR과 스트레스 DSR을 계산해 드립니다.</p>
+  <p class="updated">2026년 스트레스 금리 기준 적용 · 최종 업데이트 2026-09-28</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label for="income">연소득 (만원, 세전)</label>
+      <input id="income" type="number" value="6000" min="0" />
+    </div>
+    <div class="field">
+      <label for="existing">기존 대출 연간 원리금 합계 (만원)</label>
+      <input id="existing" type="number" value="0" min="0" />
+      <div class="hint">없으면 0. 신용대출은 만기 5년 분할상환 기준으로 환산</div>
+    </div>
+    <div class="field">
+      <label for="amount">신규 대출금액 (만원)</label>
+      <input id="amount" type="number" value="30000" min="0" />
+    </div>
+    <div class="field">
+      <label for="rate">연 금리 (%)</label>
+      <input id="rate" type="number" value="4" min="0" step="0.1" />
+    </div>
+    <div class="field">
+      <label for="years">만기 (년)</label>
+      <input id="years" type="number" value="30" min="1" />
+    </div>
+    <div class="field">
+      <label for="region">지역</label>
+      <select id="region">
+        <option value="metro">수도권 · 규제지역</option>
+        <option value="local">지방</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="ratetype">금리 형태</label>
+      <select id="ratetype">
+        <option value="variable">변동금리</option>
+        <option value="fixed">고정금리 (5년 이상)</option>
+      </select>
+    </div>
+    <button class="btn" id="calc-btn">DSR 계산하기</button>
+
+    <div class="result" id="result">
+      <table>
+        <tr><th>항목</th><th>값</th></tr>
+        <tr><td>신규 대출 월 상환액</td><td id="r-monthly">-</td></tr>
+        <tr><td><strong>DSR</strong></td><td id="r-dsr">-</td></tr>
+        <tr><td><strong>스트레스 DSR</strong></td><td id="r-sdsr">-</td></tr>
+        <tr><td>적용 스트레스 금리</td><td id="r-srate">-</td></tr>
+      </table>
+      <p class="note" id="r-judge"></p>
+      <p class="note">은행권 기준 DSR 40% 이내. 실제 한도·승인 여부는 금융기관 심사 기준에 따릅니다.</p>
+    </div>
+  </section>
+
+  <script>
+    import { calcDSR } from '../../lib/dsr.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    $('calc-btn').addEventListener('click', () => {
+      const r = calcDSR({
+        annualIncome: num('income') * 10000,
+        existingAnnualPayments: num('existing') * 10000,
+        newLoan: {
+          amount: num('amount') * 10000,
+          rate: num('rate') / 100,
+          years: num('years'),
+          type: 'mortgage',
+          region: $('region').value,
+          rateType: $('ratetype').value,
+        },
+      });
+      $('r-monthly').textContent = fmt(r.newMonthly);
+      $('r-dsr').textContent = r.dsr.toFixed(2) + '% ' + (r.withinLimit ? '✅' : '❌');
+      $('r-sdsr').textContent = r.stressDsr.toFixed(2) + '% ' + (r.stressWithinLimit ? '✅' : '❌');
+      $('r-srate').textContent = r.stressApplied ? `+3.0%p 가산 (적용 금리 ${r.stressRate}%)` : '미적용';
+      $('r-judge').textContent = r.stressWithinLimit
+        ? '스트레스 DSR이 40% 이내로, 은행권 기준을 충족할 가능성이 높습니다.'
+        : '스트레스 DSR이 40%를 초과합니다. 대출금액을 줄이거나 만기를 늘려보세요.';
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>DSR이 뭔가요?</h2>
+    <p><strong>DSR(총부채원리금상환비율)</strong> = 모든 대출의 연간 원리금 상환액 ÷ 연소득 × 100. 갚을 능력을 초과하는 대출을 막기 위한 규제입니다. 은행권은 총대출 1억원 초과 차주에게 <strong>40%</strong> 한도를 적용합니다.</p>
+    <h2>스트레스 DSR</h2>
+    <p>한도 산정 시 실제 금리에 스트레스 금리를 더해 계산합니다. 2026년 하반기 기준 <strong>수도권·규제지역 주택담보대출에 3.0%p</strong>가 가산됩니다(3단계 100% 반영). 고정금리(5년 이상)는 가산이 완화·면제될 수 있습니다.</p>
+    <table class="rate">
+      <tr><th>대출 종류</th><th>DSR 반영 방식</th></tr>
+      <tr><td>주택담보대출</td><td>실제 만기 기준 원리금</td></tr>
+      <tr><td>신용대출</td><td>만기 5년 분할상환으로 환산</td></tr>
+      <tr><td>전세자금대출</td><td>이자 상환액 반영</td></tr>
+      <tr><td>카드론·현금서비스</td><td>잔액 기준 반영</td></tr>
+    </table>
+  </section>
+
+  <Faq items={faqs} />
+
+  <section class="related">
+    <h2>관련 계산기</h2>
+    <div class="grid">
+      <a class="card" href="/salary/"><h3>연봉 실수령액 계산기</h3><p>내 연소득 확인하기</p></a>
+      <a class="card" href="/severance/"><h3>퇴직금 계산기</h3><p>목돈 마련 계획에</p></a>
+    </div>
+  </section>
+</BaseLayout>

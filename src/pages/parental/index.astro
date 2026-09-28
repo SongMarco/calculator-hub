@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Faq from '../../components/Faq.astro';
+
+const faqs = [
+  {
+    q: '사후지급금이 뭔가요? 이제 없어진 건가요?',
+    a: '과거에는 육아휴직 급여의 25%를 떼어뒀다가 복직 후 6개월이 지나야 지급했습니다. 이 제도가 폐지되어 현재는 휴직 중에 산정된 급여를 매월 전액 받을 수 있습니다.',
+  },
+  {
+    q: '누가 받을 수 있나요?',
+    a: '만 8세 이하 또는 초등학교 2학년 이하 자녀를 양육하기 위해 육아휴직을 사용하고, 휴직 시작일 이전 고용보험 가입기간이 합산 180일 이상인 근로자입니다. 같은 자녀에 대해 30일 이상 휴직해야 합니다.',
+  },
+  {
+    q: '6+6 부모함께육아휴직제는 뭔가요?',
+    a: '생후 18개월 이내 자녀에 대해 부모가 함께 육아휴직을 사용하면 첫 6개월간 상한이 높아지는 특례입니다(1개월차 최대 200만원부터 6개월차 최대 450만원까지 단계적 상향). 이 계산기는 일반 육아휴직 기준이므로 특례 해당 시 고용보험 모의계산으로 별도 확인하세요.',
+  },
+  {
+    q: '아빠도 받을 수 있나요?',
+    a: '네. 육아휴직과 급여는 부모 각각에게 적용됩니다. 조건을 충족하면 아빠도 동일하게 신청할 수 있습니다.',
+  },
+  {
+    q: '부모급여와 중복으로 받을 수 있나요?',
+    a: '네. 부모급여는 아동 연령 기준(만 0세 월 100만원, 만 1세 월 50만원)으로 육아휴직 여부와 무관하게 지급되므로 함께 받을 수 있습니다.',
+  },
+];
+---
+<BaseLayout
+  title="2026년 육아휴직 급여 계산기"
+  description="2026년 육아휴직 급여 지급 기준(1~3개월 최대 250만원)으로 휴직 기간별 예상 수령액을 계산하세요. 월별 지급 스케줄 제공."
+  keywords="육아휴직 급여 계산기, 2026 육아휴직 급여, 육아휴직 급여 상한"
+  path="/parental/"
+>
+  <p class="breadcrumb"><a href="/">홈</a> &gt; 육아휴직 급여 계산기</p>
+  <h1 class="page-title">2026년 육아휴직 급여 계산기</h1>
+  <p class="page-desc">통상임금과 휴직 개월수를 입력하면 기간별 예상 급여를 계산해 드립니다.</p>
+  <p class="updated">2026년 지급 기준 적용 · 최종 업데이트 2026-09-28</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label for="wage">통상임금 월액 (만원)</label>
+      <input id="wage" type="number" value="300" min="0" />
+      <div class="hint">육아휴직 시작일 기준 통상임금</div>
+    </div>
+    <div class="field">
+      <label for="months">휴직 개월수</label>
+      <input id="months" type="number" value="12" min="1" max="18" />
+      <div class="hint">기본 최대 1년, 조건 충족 시 1년 6개월</div>
+    </div>
+    <button class="btn" id="calc-btn">급여 계산하기</button>
+
+    <div class="result" id="result">
+      <div>휴직 기간 총 예상 급여</div>
+      <div class="big" id="r-total">-</div>
+      <table>
+        <tr><th>개월차</th><th>예상 급여</th></tr>
+        <tbody id="r-schedule"></tbody>
+      </table>
+      <p class="note">일반 육아휴직 기준이며, 6+6 부모함께육아휴직 특례는 별도 기준이 적용됩니다.</p>
+    </div>
+  </section>
+
+  <script>
+    import { calcParentalLeave } from '../../lib/parental.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    $('calc-btn').addEventListener('click', () => {
+      const r = calcParentalLeave({ monthlyWage: num('wage') * 10000, months: Math.floor(num('months')) });
+      $('r-total').textContent = fmt(r.total);
+      $('r-schedule').innerHTML = r.schedule.map((s) =>
+        `<tr><td>${s.month}개월차</td><td>${fmt(s.pay)}</td></tr>`).join('');
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>2026년 지급 기준</h2>
+    <table class="rate">
+      <tr><th>휴직 기간</th><th>지급 기준</th><th>월 상한</th></tr>
+      <tr><td>1~3개월차</td><td>통상임금의 100%</td><td>250만원</td></tr>
+      <tr><td>4~6개월차</td><td>통상임금의 100%</td><td>200만원</td></tr>
+      <tr><td>7개월차 이후</td><td>통상임금의 80%</td><td>160만원</td></tr>
+    </table>
+    <p>월 하한액은 70만원입니다. 사후지급금 제도가 폐지되어 휴직 중에 매월 전액을 받을 수 있습니다.</p>
+    <h2>신청 방법</h2>
+    <ol>
+      <li>휴직 시작 예정일 <strong>30일 전</strong>까지 회사에 육아휴직 신청서를 제출합니다.</li>
+      <li>휴직 시작 후 1개월이 지난 시점부터 매월 고용보험 홈페이지·모바일 앱에서 급여를 신청합니다.</li>
+      <li>회사가 고용센터에 확인서를 등록해야 하므로 인사담당자에게 미리 확인하세요.</li>
+    </ol>
+  </section>
+
+  <Faq items={faqs} />
+
+  <section class="related">
+    <h2>관련 계산기</h2>
+    <div class="grid">
+      <a class="card" href="/salary/"><h3>연봉 실수령액 계산기</h3><p>복직 후 월급 계산</p></a>
+      <a class="card" href="/severance/"><h3>퇴직금 계산기</h3><p>세후 실수령액까지</p></a>
+    </div>
+  </section>
+</BaseLayout>

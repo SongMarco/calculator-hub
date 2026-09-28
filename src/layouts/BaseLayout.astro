@@ -1,0 +1,56 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  keywords?: string;
+  path?: string;
+}
+const { title, description, keywords = '', path = '/' } = Astro.props;
+const siteName = '계산기허브';
+const fullTitle = `${title} | ${siteName}`;
+import '../styles/global.css';
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  {keywords && <meta name="keywords" content={keywords} />}
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content={siteName} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta name="robots" content="index, follow" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/">🧮 계산기<span>허브</span></a>
+      <nav class="nav">
+        <a href="/salary/">연봉 실수령액</a>
+        <a href="/severance/">퇴직금</a>
+        <a href="/dsr/">DSR</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <slot />
+    <!-- AdSense 광고 슬롯 (승인 후 활성화): 페이지당 최대 3개 권장
+    <ins class="adsbygoogle" data-ad-client="ca-pub-XXXX" data-ad-slot="XXXX"></ins>
+    -->
+  </main>
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="disclaimer">
+        ⚠️ 이 사이트의 모든 계산 결과는 2026년 기준 요율을 적용한 <strong>참고용 추정치</strong>입니다.
+        실제 금액은 개인별 공제 항목, 회사 규정, 금융기관 심사 기준에 따라 달라질 수 있습니다.
+        중요한 의사결정 전에는 국세청·국민연금공단·고용노동부 등 공식 기관의 계산기나 전문가 상담을 병행하세요.
+      </div>
+      <p>© 2026 계산기허브. 돈 계산, 쉽게.</p>
+    </div>
+  </footer>
+</body>
+</html>

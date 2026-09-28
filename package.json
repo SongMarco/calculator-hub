@@ -1,0 +1,1 @@
+{"dependencies":{"astro":"^7.3.5"},"description":"한국 시장 대상 AdSense 수익화용 계산기 허브 (Astro 정적 사이트)","keywords":["calculator","adsense","korea"],"license":"ISC","name":"calculator-hub","scripts":{"build":"astro build","dev":"astro dev","preview":"astro preview","test":"node --test tests/*.test.js"},"type":"module","version":"1.0.0"}
