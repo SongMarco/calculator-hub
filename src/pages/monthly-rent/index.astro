@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Faq from '../../components/Faq.astro';
+import GovSupport from '../../components/GovSupport.astro';
 import { faqJsonLd, SITE_URL } from '../../lib/seo.js';
 
 const faqs = [
@@ -118,6 +119,8 @@ const faqs = [
   </section>
 
   <Faq items={faqs} />
+
+  <GovSupport page="monthly-rent" />
 
   <section class="related">
     <h2>관련 계산기</h2>

@@ -1,0 +1,28 @@
+---
+import { programsForPage } from '../data/welfare.js';
+interface Props { page: string; }
+const { page } = Astro.props;
+const items = programsForPage(page);
+---
+{items.length > 0 && (
+  <section class="article govsupport">
+    <h2>🏛️ 함께 확인하면 좋은 정부 지원 제도</h2>
+    <p class="gov-intro">이 계산기와 관련해 받을 수 있는 정부 복지·지원금입니다. 조건이 맞으면 함께 신청해 보세요.</p>
+    <div class="gov-grid">
+      {items.map((p) => (
+        <div class="gov-card">
+          <h3>{p.name}</h3>
+          <p class="gov-summary">{p.summary}</p>
+          <dl class="gov-facts">
+            <div><dt>대상</dt><dd>{p.target}</dd></div>
+            <div><dt>지원 내용</dt><dd>{p.benefit}</dd></div>
+          </dl>
+          <p class="gov-desc">{p.desc}</p>
+          <a class="gov-link" href={p.url} target="_blank" rel="noopener">{p.urlLabel} ↗</a>
+        </div>
+      ))}
+    </div>
+    <a class="btn-welfare" href="/calculator-hub/welfare/">💰 내 연봉으로 받을 수 있는지 확인하기</a>
+    <p class="note">2026년 9월 기준이며, 실제 신청 조건은 공식 사이트에서 확인하세요.</p>
+  </section>
+)}
