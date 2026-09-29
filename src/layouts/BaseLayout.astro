@@ -5,10 +5,13 @@ interface Props {
   keywords?: string;
   path?: string;
   jsonLd?: Record<string, unknown>;
+  ogImage?: string;
 }
 const { title, description, keywords = '', path = '/', jsonLd } = Astro.props;
 const siteName = '계산기허브';
 const fullTitle = `${title} | ${siteName}`;
+const VERCEL_BASE = 'https://calculator-hub-songmarcos-projects.vercel.app';
+const { ogImage = `${VERCEL_BASE}/images/og-hub.webp` } = Astro.props;
 import '../styles/global.css';
 ---
 <!DOCTYPE html>
@@ -23,6 +26,11 @@ import '../styles/global.css';
   <meta property="og:site_name" content={siteName} />
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={description} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:url" content={`${VERCEL_BASE}${path}`} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content={ogImage} />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <meta name="robots" content="index, follow" />
   {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>" />
@@ -31,7 +39,7 @@ import '../styles/global.css';
 <body>
   <header class="site-header">
     <div class="wrap">
-      <a class="brand" href="/calculator-hub/">🧮 계산기<span>허브</span></a>
+      <a class="brand" href="/calculator-hub/"><span class="brand-mark">🧮</span>계산기<span>허브</span></a>
       <nav class="nav">
         <a href="/calculator-hub/salary/">연봉 실수령액</a>
         <a href="/calculator-hub/severance/">퇴직금</a>
@@ -39,6 +47,7 @@ import '../styles/global.css';
         <a href="/calculator-hub/irp/">IRP 세금비교</a>
         <a href="/calculator-hub/hourly-wage/">주휴 시급</a>
         <a href="/calculator-hub/dsr/">DSR</a>
+        <a href="/calculator-hub/welfare/">정부 지원금</a>
       </nav>
     </div>
   </header>
@@ -50,6 +59,7 @@ import '../styles/global.css';
   </main>
   <footer class="site-footer">
     <div class="wrap">
+      <p class="foot-brand">🧮 계산기허브</p>
       <div class="disclaimer">
         ⚠️ 이 사이트의 모든 계산 결과는 2026년 기준 요율을 적용한 <strong>참고용 추정치</strong>입니다.
         실제 금액은 개인별 공제 항목, 회사 규정, 금융기관 심사 기준에 따라 달라질 수 있습니다.
