@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://calculator-hub-songmarcos-projects.vercel.app/sitemap-index.xml
+Sitemap: https://calc.choronglight.com/sitemap-index.xml
