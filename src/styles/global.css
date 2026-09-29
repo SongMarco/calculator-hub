@@ -133,6 +133,26 @@ a:hover { text-decoration: underline; }
 .w-summary { font-size: 0.92rem; color: var(--muted); margin: 0 0 12px; }
 .w-note { font-size: 0.85rem; color: var(--muted); background: var(--accent); border-radius: 8px; padding: 10px 12px; }
 
+/* welfare pyramid */
+.pyr-note { font-size: 0.88rem; color: var(--muted); margin: 0 0 16px; }
+.pyramid { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 8px 0 4px; }
+.pyr-bar {
+  min-width: 190px; max-width: 100%; min-height: 76px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  border: 2px solid var(--line); border-radius: var(--radius); background: #fff;
+  cursor: pointer; padding: 12px 16px; transition: transform .15s, border-color .15s, background .15s;
+}
+.pyr-bar:hover { transform: scale(1.02); }
+.pyr-bar.active { border-color: var(--brand); background: var(--accent); box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+.pyr-label { font-size: 1.05rem; font-weight: 800; }
+.pyr-meta { font-size: 0.82rem; color: var(--muted); }
+.pyr-count { color: var(--brand); font-weight: 700; }
+.pyr-count.zero { color: #94a3b8; font-weight: 600; }
+.pyr-selected { text-align: center; font-size: 1.02rem; margin: 16px 0 4px; }
+.pyr-selected b { color: var(--brand); }
+.w-badge.w-warn { background: #fef9c3; color: #a16207; }
+.w-list-sub { color: var(--muted); font-size: 0.92rem; margin: -2px 0 8px; }
+
 @media (max-width: 560px) {
   .hero h1 { font-size: 1.5rem; }
   .calc, .article { padding: 20px; }

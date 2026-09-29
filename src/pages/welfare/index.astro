@@ -2,6 +2,17 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { PROGRAMS, MEDIAN_INCOME_2026 } from '../../data/welfare.js';
 
+// 연봉 구간 피라미드 (2024년 귀속 국세청 연말정산 통계 기반 대략적 근로소득 분포)
+// share: 해당 구간 인구 비중(%), upper: null = 상한 없음
+const BRACKETS = [
+  { id: 'b5', label: '1억원 이상', share: 7, lower: 10000, upper: null },
+  { id: 'b4', label: '7천 ~ 1억원', share: 14, lower: 7000, upper: 10000 },
+  { id: 'b3', label: '5천 ~ 7천만원', share: 15, lower: 5000, upper: 7000 },
+  { id: 'b2', label: '3천 ~ 5천만원', share: 26, lower: 3000, upper: 5000 },
+  { id: 'b1', label: '3천만원 미만', share: 38, lower: 0, upper: 3000 },
+];
+const maxShare = Math.max(...BRACKETS.map((b) => b.share));
+
 function criterionText(p) {
   const t = p.income.type;
   if (t === 'none') return '소득 기준 없음';
@@ -11,22 +22,34 @@ function criterionText(p) {
 ---
 <BaseLayout
   title="내 연봉으로 찾는 정부 지원금 (2026)"
-  description="연봉과 가구원 수를 입력하면 2026년 기준 받을 수 있는 정부 복지·지원금 11종을 골라드립니다. 부모급여, 청년월세, 근로장려금, 디딤돌대출 등 소득 기준 판정."
+  description="연봉 구간을 고르면 2026년 기준 받을 수 있는 정부 복지·지원금 11종을 골라드립니다. 부모급여, 청년월세, 근로장려금, 디딤돌대출 등 소득 기준 판정."
   keywords="정부 지원금 찾기, 내 연봉 지원금, 2026 복지 혜택, 청년월세 지원 조건, 근로장려금 조건"
   path="/welfare/"
 >
   <p class="breadcrumb"><a href="/calculator-hub/">홈</a> &gt; 정부 지원금 찾기</p>
   <h1 class="page-title">내 연봉으로 찾는 정부 지원금 💰</h1>
-  <p class="page-desc">연봉과 가구원 수를 입력하면 2026년 기준 받을 수 있는 정부 지원금만 골라드립니다.</p>
+  <p class="page-desc">피라미드에서 내 연봉 구간을 누르면, 받을 수 있는 정부 지원금 클러스터를 보여드립니다.</p>
   <p class="updated">2026년 기준 중위소득(보건복지부 고시) 적용 · 최종 업데이트 2026-09-29</p>
 
-  <section class="calc welfare-input">
-    <h2>📝 내 정보 입력</h2>
-    <div class="field">
-      <label for="w-salary">세전 연봉 (만원)</label>
-      <input id="w-salary" type="number" value="" min="0" placeholder="예: 3600" />
-      <div class="hint">세전 총급여 기준. 상여금 포함 연봉을 입력하세요.</div>
+  <section class="calc">
+    <h2>📊 내 연봉 구간 선택</h2>
+    <p class="pyr-note">막대 너비는 2024년 귀속 국세청 연말정산 통계 기반 <strong>대략적 근로소득 분포</strong>에 비례합니다. 막대를 눌러 구간을 선택하세요.</p>
+    <div class="pyramid" id="pyramid">
+      {BRACKETS.map((b) => (
+        <button
+          type="button"
+          class="pyr-bar"
+          data-id={b.id}
+          style={`width:${Math.round((b.share / maxShare) * 100)}%`}
+          aria-label={`연봉 구간 ${b.label} 선택`}
+        >
+          <span class="pyr-label">{b.label}</span>
+          <span class="pyr-meta">인구 약 {b.share}% · <b class="pyr-count" data-count-for={b.id}>계산 중…</b></span>
+        </button>
+      ))}
     </div>
+    <p class="pyr-selected" id="pyr-selected">위 피라미드에서 내 연봉 구간을 눌러주세요 👆</p>
+
     <div class="field">
       <label>가구원 수</label>
       <div class="hh-btns" id="w-household">
@@ -35,28 +58,29 @@ function criterionText(p) {
         <button type="button" data-hh="3">3인</button>
         <button type="button" data-hh="4">4인 이상</button>
       </div>
-      <div class="hint">4인 이상은 4인 가구 기준으로 계산됩니다.</div>
+      <div class="hint">중위소득 기준 환산에 사용합니다. 4인 이상은 4인 가구 기준으로 계산됩니다.</div>
     </div>
     <label class="w-toggle">
       <input type="checkbox" id="w-only-ok" /> 받을 수 있는 것만 보기
     </label>
-    <p class="note">소득 기준은 1차 판정용입니다. 실제 심사는 건강보험료·재산·가구 특성 등을 종합하므로 참고용으로만 활용하세요.</p>
   </section>
 
   <section class="w-list" id="w-list">
-    <h2>🏛️ 정부 지원금 11종</h2>
+    <h2 id="w-list-title">🏛️ 정부 지원금 11종</h2>
+    <p class="w-list-sub" id="w-list-sub">구간을 선택하면 해당 구간의 지원금 클러스터를 보여드립니다.</p>
     {PROGRAMS.map((p) => (
       <article
         class="w-card"
         data-type={p.income.type}
         data-percent={p.income.type === 'median' ? p.income.percent : ''}
         data-amount={p.income.type === 'salaryCap' ? p.income.amount : ''}
+        data-base-criterion={criterionText(p)}
       >
         <div class="w-head">
           <h3>{p.name}</h3>
-          <span class="w-badge w-neutral">연봉을 입력하세요</span>
+          <span class="w-badge w-neutral">구간을 선택하세요</span>
         </div>
-        <p class="w-criterion" data-base={criterionText(p)}>소득 기준: {criterionText(p)}</p>
+        <p class="w-criterion">소득 기준: {criterionText(p)}</p>
         <p class="w-summary">{p.summary}</p>
         <dl class="gov-facts">
           <div><dt>대상</dt><dd>{p.target}</dd></div>
@@ -76,87 +100,154 @@ function criterionText(p) {
       <tr><td>중위소득 100%</td><td>256만원</td><td>420만원</td><td>536만원</td><td>649만원</td></tr>
     </table>
     <p>보건복지부 고시 기준이며, 원 단위 정확한 금액은 복지로에서 확인할 수 있습니다. 중위소득 기준 제도는 월 소득인정액(근로소득 공제·재산 환산을 반영한 금액)으로 심사하므로, 월급이 기준보다 조금 높아도 해당될 수 있습니다.</p>
+    <h2>판정 기준 안내</h2>
+    <ul>
+      <li><strong>받을 수 있어요</strong>: 제도 소득 상한이 선택한 구간의 상한보다 높거나 같아, 구간 내 어떤 연봉에서도 기준을 만족합니다.</li>
+      <li><strong>정확한 연봉 확인 필요</strong>: 제도 소득 상한이 구간 안에 걸쳐 있어, 실제 연봉에 따라 결과가 달라집니다.</li>
+      <li><strong>소득 기준 초과</strong>: 제도 소득 상한이 구간 하한보다 낮아 해당 구간에서는 받기 어렵습니다.</li>
+    </ul>
     <h2>꼭 알아두세요</h2>
     <ul>
       <li>이 페이지의 판정은 <strong>소득 기준만</strong>으로 가린 1차 참고 결과입니다. 나이·무주택 여부·고용보험 가입기간 같은 다른 조건도 함께 충족해야 합니다.</li>
-      <li>연봉은 세전 총급여 기준 근사치로 계산됩니다. 실제 심사는 건강보험료 납부액·재산 등을 종합합니다.</li>
+      <li>실제 심사는 건강보험료 납부액·재산 등을 종합하므로 참고용으로만 활용하세요.</li>
       <li>제도는 매년 바뀌므로 신청 전 반드시 공식 사이트의 최신 공고를 확인하세요.</li>
     </ul>
     <p class="note">2026년 9월 기준이며, 실제 신청 조건은 공식 사이트에서 확인하세요.</p>
   </section>
 
-  <script define:vars={{ median: MEDIAN_INCOME_2026 }}>
-    const $ = (id) => document.getElementById(id);
+  <script define:vars={{ median: MEDIAN_INCOME_2026, brackets: BRACKETS }}>
     let household = 1;
-    const salaryEl = $('w-salary');
-    const listEl = $('w-list');
-    const onlyOkEl = $('w-only-ok');
+    let selected = null;
+    const onlyOkEl = document.getElementById('w-only-ok');
+    const selectedEl = document.getElementById('pyr-selected');
+    const listTitleEl = document.getElementById('w-list-title');
+    const listSubEl = document.getElementById('w-list-sub');
+    const cards = Array.from(document.querySelectorAll('.w-card'));
+
+    // 제도별 소득 상한(만원). 소득 기준 없으면 Infinity
+    function capOf(card) {
+      const t = card.dataset.type;
+      if (t === 'none') return Infinity;
+      if (t === 'median') {
+        const pct = parseFloat(card.dataset.percent);
+        const base = median[Math.min(household, 6)] || median[4];
+        return Math.floor((base * pct) / 100 / 10000);
+      }
+      return parseFloat(card.dataset.amount);
+    }
+
+    // 3상태 판정
+    function judge(cap, br) {
+      const upper = br.upper === null ? Infinity : br.upper;
+      if (cap >= upper) return 'ok';
+      if (cap < br.lower) return 'no';
+      return 'warn';
+    }
+
+    const STATE = {
+      ok:   { cls: 'w-ok',      text: '받을 수 있어요' },
+      warn: { cls: 'w-warn',    text: '정확한 연봉 확인 필요' },
+      no:   { cls: 'w-no',      text: '소득 기준 초과' },
+    };
+
+    function fmtCap(cap) {
+      return cap === Infinity ? '없음' : `약 ${cap.toLocaleString('ko-KR')}만원 이하`;
+    }
+
+    function criterionLine(card, cap) {
+      const base = card.dataset.baseCriterion;
+      const t = card.dataset.type;
+      if (t === 'median') {
+        const hhLabel = household === 4 ? '4인 이상' : `${household}인`;
+        return `소득 기준: ${base} → 연봉 ${fmtCap(cap)} (${hhLabel} 가구 기준)`;
+      }
+      return `소득 기준: ${base}`;
+    }
+
+    // 피라미드 카운트 뱃지 (가구원 수 기준 실시간)
+    function refreshCounts() {
+      brackets.forEach((br) => {
+        let n = 0;
+        cards.forEach((card) => {
+          if (judge(capOf(card), br) === 'ok') n++;
+        });
+        const el = document.querySelector(`[data-count-for="${br.id}"]`);
+        if (el) {
+          el.textContent = n === 0 ? '해당 없음' : `받을 수 있는 지원금 ${n}개`;
+          el.classList.toggle('zero', n === 0);
+        }
+      });
+    }
+
+    function render() {
+      const br = brackets.find((b) => b.id === selected) || null;
+      const onlyOk = onlyOkEl.checked;
+
+      if (br) {
+        selectedEl.innerHTML = `내 연봉 구간: <b>${br.label}</b>`;
+        listTitleEl.textContent = `📍 ${br.label} 구간의 지원금 클러스터`;
+      } else {
+        selectedEl.textContent = '위 피라미드에서 내 연봉 구간을 눌러주세요 👆';
+        listTitleEl.textContent = '🏛️ 정부 지원금 11종';
+        listSubEl.textContent = '구간을 선택하면 해당 구간의 지원금 클러스터를 보여드립니다.';
+      }
+
+      let shown = 0, okCount = 0;
+      cards.forEach((card) => {
+        const cap = capOf(card);
+        const badge = card.querySelector('.w-badge');
+        const crit = card.querySelector('.w-criterion');
+        crit.textContent = criterionLine(card, cap);
+
+        if (!br) {
+          badge.className = 'w-badge w-neutral';
+          badge.textContent = '구간을 선택하세요';
+          card.style.display = '';
+          shown++;
+          return;
+        }
+        const st = judge(cap, br);
+        const meta = STATE[st];
+        badge.className = `w-badge ${meta.cls}`;
+        badge.textContent = meta.text;
+        if (st === 'ok') okCount++;
+        // 클러스터: ok + warn 표시, no 제외. 토글 on이면 ok만
+        const visible = st !== 'no' && !(onlyOk && st !== 'ok');
+        card.style.display = visible ? '' : 'none';
+        if (visible) shown++;
+      });
+
+      if (br) {
+        listSubEl.textContent =
+          shown === 0
+            ? '이 구간에서 받을 수 있는 지원금이 없습니다.'
+            : `이 구간에서 ${okCount}개는 확실히 받을 수 있고, ${shown - okCount}개는 연봉에 따라 확인이 필요합니다.`;
+      }
+    }
+
+    document.querySelectorAll('.pyr-bar').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        selected = selected === id ? null : id; // 다시 누르면 해제
+        document.querySelectorAll('.pyr-bar').forEach((b) =>
+          b.classList.toggle('active', b.dataset.id === selected)
+        );
+        render();
+      });
+    });
 
     document.querySelectorAll('#w-household button').forEach((btn) => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('#w-household button').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
         household = parseInt(btn.dataset.hh, 10);
-        judge();
+        refreshCounts();
+        render();
       });
     });
-    salaryEl.addEventListener('input', judge);
-    onlyOkEl.addEventListener('change', applyFilter);
+    onlyOkEl.addEventListener('change', render);
 
-    function capFor(card) {
-      const type = card.dataset.type;
-      if (type === 'median') {
-        const pct = parseFloat(card.dataset.percent);
-        const base = median[Math.min(household, 6)] || median[4];
-        return { cap: Math.floor((base * pct) / 100 / 10000), label: `중위소득 ${pct}% 이하` };
-      }
-      if (type === 'salaryCap') {
-        const amt = parseFloat(card.dataset.amount);
-        return { cap: amt, label: `연봉 ${amt.toLocaleString('ko-KR')}만원 이하` };
-      }
-      return { cap: null, label: '소득 기준 없음' };
-    }
-
-    function judge() {
-      const salary = parseFloat(String(salaryEl.value).replace(/,/g, '')) || 0;
-      document.querySelectorAll('.w-card').forEach((card) => {
-        const badge = card.querySelector('.w-badge');
-        const crit = card.querySelector('.w-criterion');
-        const { cap, label } = capFor(card);
-        card.classList.remove('w-ok', 'w-dim');
-        if (salary <= 0) {
-          badge.className = 'w-badge w-neutral';
-          badge.textContent = '연봉을 입력하세요';
-          crit.textContent = `소득 기준: ${label}`;
-          return;
-        }
-        if (cap === null) {
-          badge.className = 'w-badge w-ok';
-          badge.textContent = '받을 수 있어요';
-          crit.textContent = `소득 기준: ${label} (다른 조건 확인 필요)`;
-          card.classList.add('w-ok');
-          return;
-        }
-        if (salary <= cap) {
-          badge.className = 'w-badge w-ok';
-          badge.textContent = '받을 수 있어요';
-          crit.textContent = `소득 기준: ${label} → 연봉 약 ${cap.toLocaleString('ko-KR')}만원 이하 (${household === 4 ? '4인 이상' : household + '인'} 가구 기준)`;
-          card.classList.add('w-ok');
-        } else {
-          badge.className = 'w-badge w-no';
-          badge.textContent = '소득 기준 초과';
-          crit.textContent = `소득 기준: ${label} → 연봉 약 ${cap.toLocaleString('ko-KR')}만원 이하 (${household === 4 ? '4인 이상' : household + '인'} 가구 기준)`;
-          card.classList.add('w-dim');
-        }
-      });
-      applyFilter();
-    }
-
-    function applyFilter() {
-      const hide = onlyOkEl.checked;
-      document.querySelectorAll('.w-card').forEach((card) => {
-        card.style.display = hide && card.classList.contains('w-dim') ? 'none' : '';
-      });
-    }
+    refreshCounts();
+    render();
   </script>
 </BaseLayout>
