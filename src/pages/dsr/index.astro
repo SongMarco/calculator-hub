@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
-import { faqJsonLd, SITE_URL } from '../../lib/seo.js';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
   {
@@ -32,10 +33,10 @@ const faqs = [
   description="내 대출의 DSR과 스트레스 금리를 적용한 DSR을 계산해 대출 한도 가능 여부를 확인하세요. 2026년 스트레스 금리 기준 반영."
   keywords="DSR 계산기, 스트레스 DSR, DSR 40%, 주택담보대출 한도"
   path="/dsr/"
-  ogImage="https://calculator-hub-songmarcos-projects.vercel.app/images/card-dsr.webp"
-  jsonLd={faqJsonLd(faqs, `${SITE_URL}/dsr/`)}
+  ogImage="/images/card-dsr.webp"
+  jsonLd={faqJsonLd(faqs, pageUrl("/dsr/"))}
 >
-  <p class="breadcrumb"><a href="/calculator-hub/">홈</a> &gt; DSR 계산기</p>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; DSR 계산기</p>
   <h1 class="page-title">DSR · 스트레스 DSR 계산기</h1>
   <p class="page-desc">연소득과 대출 조건을 입력하면 DSR과 스트레스 DSR을 계산해 드립니다.</p>
   <p class="updated">2026년 스트레스 금리 기준 적용 · 최종 업데이트 2026-09-28</p>
@@ -142,8 +143,8 @@ const faqs = [
   <section class="related">
     <h2>관련 계산기</h2>
     <div class="grid">
-      <a class="card" href="/calculator-hub/salary/"><h3>연봉 실수령액 계산기</h3><p>내 연소득 확인하기</p></a>
-      <a class="card" href="/calculator-hub/severance/"><h3>퇴직금 계산기</h3><p>목돈 마련 계획에</p></a>
+      <a class="card" href={u("/salary/")}><h3>연봉 실수령액 계산기</h3><p>내 연소득 확인하기</p></a>
+      <a class="card" href={u("/severance/")}><h3>퇴직금 계산기</h3><p>목돈 마련 계획에</p></a>
     </div>
   </section>
 </BaseLayout>

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://songmarco.github.io/calculator-hub/sitemap.xml
+Sitemap: https://calculator-hub-songmarcos-projects.vercel.app/sitemap-index.xml

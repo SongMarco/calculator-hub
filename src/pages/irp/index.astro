@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
-import { faqJsonLd, SITE_URL } from '../../lib/seo.js';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
   {
@@ -32,10 +33,10 @@ const faqs = [
   description="퇴직금을 IRP에서 일시금으로 받을 때와 연금으로 받을 때의 세금을 비교하세요. 수령 기간별 감면율(30~50%)과 운용수익 과세 차이까지 계산합니다."
   keywords="IRP 일시금 연금 세금, 퇴직금 연금 수령 절세, IRP 세금 비교, 퇴직소득세 감면"
   path="/irp/"
-  ogImage="https://calculator-hub-songmarcos-projects.vercel.app/images/card-irp.webp"
-  jsonLd={faqJsonLd(faqs, `${SITE_URL}/irp/`)}
+  ogImage="/images/card-irp.webp"
+  jsonLd={faqJsonLd(faqs, pageUrl("/irp/"))}
 >
-  <p class="breadcrumb"><a href="/calculator-hub/">홈</a> &gt; IRP 세금 비교 계산기</p>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; IRP 세금 비교 계산기</p>
   <h1 class="page-title">IRP 일시금 vs 연금 수령 세금 비교</h1>
   <p class="page-desc">퇴직금을 한 번에 받을 때와 IRP에서 연금으로 나눠 받을 때, 세금이 얼마나 다른지 계산해 드립니다.</p>
   <p class="updated">2026년 세법 기준 적용 · 최종 업데이트 2026-09-29</p>
@@ -134,9 +135,9 @@ const faqs = [
   <section class="related">
     <h2>관련 계산기</h2>
     <div class="grid">
-      <a class="card" href="/calculator-hub/severance/"><h3>퇴직금 계산기</h3><p>세후 실수령액까지 계산</p></a>
-      <a class="card" href="/calculator-hub/salary/"><h3>연봉 실수령액 계산기</h3><p>2026년 최신 요율 반영</p></a>
-      <a class="card" href="/calculator-hub/monthly-rent/"><h3>월세 세액공제 계산기</h3><p>연 1,000만원 한도</p></a>
+      <a class="card" href={u("/severance/")}><h3>퇴직금 계산기</h3><p>세후 실수령액까지 계산</p></a>
+      <a class="card" href={u("/salary/")}><h3>연봉 실수령액 계산기</h3><p>2026년 최신 요율 반영</p></a>
+      <a class="card" href={u("/monthly-rent/")}><h3>월세 세액공제 계산기</h3><p>연 1,000만원 한도</p></a>
     </div>
   </section>
 </BaseLayout>

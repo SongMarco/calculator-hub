@@ -1,50 +1,51 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { u } from '../lib/paths.js';
 
-const IMG = '/calculator-hub/images';
+const IMG = u('/images');
 const calculators = [
   {
-    href: '/calculator-hub/salary/', tag: '2026년 최신 요율', img: `${IMG}/card-salary.webp`,
+    href: u('/salary/'), tag: '2026년 최신 요율', img: `${IMG}/card-salary.webp`,
     title: '연봉 실수령액 계산기',
     desc: '국민연금 4.75%·건강보험 3.595% 등 2026년 요율로 내 월급 실수령액을 계산해 보세요.',
   },
   {
-    href: '/calculator-hub/severance/', tag: '세후 금액까지', img: `${IMG}/card-severance.webp`,
+    href: u('/severance/'), tag: '세후 금액까지', img: `${IMG}/card-severance.webp`,
     title: '퇴직금 계산기',
     desc: '평균임금·근속연수로 세전 퇴직금을 구하고, 퇴직소득세를 뗀 세후 실수령액까지 확인하세요.',
   },
   {
-    href: '/calculator-hub/freelancer/', tag: '원천징수 3.3%', img: `${IMG}/card-freelancer.webp`,
+    href: u('/freelancer/'), tag: '원천징수 3.3%', img: `${IMG}/card-freelancer.webp`,
     title: '프리랜서 3.3% 계산기',
     desc: '사업소득 3.3% 원천징수 후 실제로 통장에 들어오는 금액을 바로 계산합니다.',
   },
   {
-    href: '/calculator-hub/parental/', tag: '2026년 개편 반영', img: `${IMG}/card-parental.webp`,
+    href: u('/parental/'), tag: '2026년 개편 반영', img: `${IMG}/card-parental.webp`,
     title: '육아휴직 급여 계산기',
     desc: '1~3개월 최대 250만원 등 2026년 지급 기준으로 휴직 기간별 예상 급여를 계산하세요.',
   },
   {
-    href: '/calculator-hub/dsr/', tag: '스트레스 DSR', img: `${IMG}/card-dsr.webp`,
+    href: u('/dsr/'), tag: '스트레스 DSR', img: `${IMG}/card-dsr.webp`,
     title: 'DSR·스트레스 DSR 계산기',
     desc: '내 대출의 DSR과 스트레스 금리를 적용한 DSR을 구해 대출 한도 가능 여부를 가늠해 보세요.',
   },
   {
-    href: '/calculator-hub/monthly-rent/', tag: '연 1,000만원 한도', img: `${IMG}/card-monthly-rent.webp`,
+    href: u('/monthly-rent/'), tag: '연 1,000만원 한도', img: `${IMG}/card-monthly-rent.webp`,
     title: '월세 세액공제 계산기',
     desc: '2026년 공제율 17%·15%로 내 월세 환급액을 계산해 보세요. 총급여 구간별 한도를 바로 확인합니다.',
   },
   {
-    href: '/calculator-hub/irp/', tag: '일시금 vs 연금', img: `${IMG}/card-irp.webp`,
+    href: u('/irp/'), tag: '일시금 vs 연금', img: `${IMG}/card-irp.webp`,
     title: 'IRP 세금 비교 계산기',
     desc: '퇴직금을 한 번에 받을 때와 연금으로 나눠 받을 때의 세금 차이를 비교해 절세액을 확인하세요.',
   },
   {
-    href: '/calculator-hub/hourly-wage/', tag: '2026년 10,320원', img: `${IMG}/card-hourly-wage.webp`,
+    href: u('/hourly-wage/'), tag: '2026년 10,320원', img: `${IMG}/card-hourly-wage.webp`,
     title: '주휴 포함 시급 계산기',
     desc: '주휴수당을 포함한 세전 월급과 실질 시급을 계산해 보세요. 최저임금 미달 여부도 체크합니다.',
   },
   {
-    href: '/calculator-hub/welfare/', tag: '소득 기준 판정', img: `${IMG}/og-welfare.webp`,
+    href: u('/welfare/'), tag: '소득 기준 판정', img: `${IMG}/og-welfare.webp`,
     title: '내 연봉으로 찾는 정부 지원금',
     desc: '연봉 구간 피라미드에서 내 구간을 누르면 받을 수 있는 정부 복지·지원금 11종을 골라드립니다.',
   },
@@ -67,7 +68,7 @@ const upcoming = [
       <p class="lead">복잡한 공식은 저희가, 결과만 가져가세요. 급여·세금·대출 계산기와 내 연봉으로 찾을 수 있는 정부 지원금까지 한 곳에 모았습니다.</p>
       <div class="hero-ctas">
         <a class="btn-light" href="#calculators">계산기 보기 ↓</a>
-        <a class="btn-outline-light" href="/calculator-hub/welfare/">💰 정부 지원금 찾기</a>
+        <a class="btn-outline-light" href={u("/welfare/")}>💰 정부 지원금 찾기</a>
       </div>
       <div class="trust-row">
         <span class="chip">✓ 공식 출처 기준</span>

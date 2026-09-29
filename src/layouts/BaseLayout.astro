@@ -7,11 +7,18 @@ interface Props {
   jsonLd?: Record<string, unknown>;
   ogImage?: string;
 }
+import { u } from '../lib/paths.js';
 const { title, description, keywords = '', path = '/', jsonLd } = Astro.props;
 const siteName = '계산기허브';
 const fullTitle = `${title} | ${siteName}`;
-const VERCEL_BASE = 'https://calculator-hub-songmarcos-projects.vercel.app';
-const { ogImage = `${VERCEL_BASE}/images/og-hub.webp` } = Astro.props;
+// 정규 site URL: astro.config.mjs의 site (Vercel 빌드 → Vercel URL, GH Pages 빌드 → songmarco.github.io/calculator-hub)
+// GH Pages의 site에는 subpath(/calculator-hub)가 이미 포함되므로, 절대 URL을 만들 때는
+// u()로 base를 중복 추가하지 않는다. path/ogImage prop은 base 없는 라우트 경로('/salary/', '/images/...') 기준.
+const SITE = (Astro.site ? Astro.site.href : 'https://calculator-hub-songmarcos-projects.vercel.app/').replace(/\/$/, '');
+const { ogImage = '/images/og-hub.webp' } = Astro.props;
+// ogImage는 상대 경로로 받아서 site 기준 절대 URL로 변환 (http로 시작하면 그대로 사용)
+const ogImageAbs = ogImage.startsWith('http') ? ogImage : `${SITE}${ogImage}`;
+const ogUrlAbs = `${SITE}${path}`;
 import '../styles/global.css';
 ---
 <!DOCTYPE html>
@@ -26,10 +33,10 @@ import '../styles/global.css';
   <meta property="og:site_name" content={siteName} />
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={description} />
-  <meta property="og:image" content={ogImage} />
-  <meta property="og:url" content={`${VERCEL_BASE}${path}`} />
+  <meta property="og:image" content={ogImageAbs} />
+  <meta property="og:url" content={ogUrlAbs} />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content={ogImage} />
+  <meta name="twitter:image" content={ogImageAbs} />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <meta name="robots" content="index, follow" />
   {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
@@ -39,15 +46,15 @@ import '../styles/global.css';
 <body>
   <header class="site-header">
     <div class="wrap">
-      <a class="brand" href="/calculator-hub/"><span class="brand-mark">🧮</span>계산기<span>허브</span></a>
+      <a class="brand" href={u('/')}><span class="brand-mark">🧮</span>계산기<span>허브</span></a>
       <nav class="nav">
-        <a href="/calculator-hub/salary/">연봉 실수령액</a>
-        <a href="/calculator-hub/severance/">퇴직금</a>
-        <a href="/calculator-hub/monthly-rent/">월세 세액공제</a>
-        <a href="/calculator-hub/irp/">IRP 세금비교</a>
-        <a href="/calculator-hub/hourly-wage/">주휴 시급</a>
-        <a href="/calculator-hub/dsr/">DSR</a>
-        <a href="/calculator-hub/welfare/">정부 지원금</a>
+        <a href={u('/salary/')}>연봉 실수령액</a>
+        <a href={u('/severance/')}>퇴직금</a>
+        <a href={u('/monthly-rent/')}>월세 세액공제</a>
+        <a href={u('/irp/')}>IRP 세금비교</a>
+        <a href={u('/hourly-wage/')}>주휴 시급</a>
+        <a href={u('/dsr/')}>DSR</a>
+        <a href={u('/welfare/')}>정부 지원금</a>
       </nav>
     </div>
   </header>

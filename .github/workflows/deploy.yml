@@ -26,6 +26,9 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+        env:
+          SITE_BASE: /calculator-hub
+          SITE_URL: https://songmarco.github.io/calculator-hub
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist

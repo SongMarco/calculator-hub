@@ -1,5 +1,6 @@
 ---
 import { programsForPage } from '../data/welfare.js';
+import { u } from '../lib/paths.js';
 interface Props { page: string; }
 const { page } = Astro.props;
 const items = programsForPage(page);
@@ -22,7 +23,7 @@ const items = programsForPage(page);
         </div>
       ))}
     </div>
-    <a class="btn-welfare" href="/calculator-hub/welfare/">💰 내 연봉으로 받을 수 있는지 확인하기</a>
+    <a class="btn-welfare" href={u('/welfare/')}>💰 내 연봉으로 받을 수 있는지 확인하기</a>
     <p class="note">2026년 9월 기준이며, 실제 신청 조건은 공식 사이트에서 확인하세요.</p>
   </section>
 )}
