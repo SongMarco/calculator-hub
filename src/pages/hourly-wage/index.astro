@@ -1,0 +1,117 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Faq from '../../components/Faq.astro';
+import { faqJsonLd, SITE_URL } from '../../lib/seo.js';
+
+const faqs = [
+  {
+    q: '주휴수당은 누구나 받을 수 있나요?',
+    a: '아니요. 1주일에 15시간 이상 일하고, 그 주의 소정 근로일을 모두 출근(개근)해야 합니다. 주 15시간 미만으로 일하는 초단시간 근로자는 주휴수당 대상에서 빠집니다.',
+  },
+  {
+    q: '월급 계산할 때 왜 209시간을 쓰나요?',
+    a: '주 40시간에 주휴 8시간을 더한 주 48시간에 월 평균 주 수 4.345주를 곱하면 208.56시간이 나와 정수 시간으로 반올림한 209시간이 됩니다. 고용노동부의 월 환산액 고시와 같은 방식입니다.',
+  },
+  {
+    q: '주휴수당을 포함하면 실질 시급은 얼마인가요?',
+    a: '2026년 최저시급 10,320원 기준으로 주 40시간 근무 시 주휴 포함 실질 시급은 12,384원입니다. 주휴수당이 붙으면 최저임금은 사실상 20% 높아지는 셈입니다.',
+  },
+  {
+    q: '수습 기간에는 시급을 깎을 수 있나요?',
+    a: '입사 3개월 이내 수습 기간에는 최저임금의 90%(2026년 기준 9,288원)까지 감액할 수 있습니다. 다만 단순노무직이나 1년 미만 계약직은 감액이 안 됩니다.',
+  },
+  {
+    q: '주 40시간을 넘게 일하면 주휴수당도 늘어나나요?',
+    a: '아니요. 주휴시간은 8시간이 상한이라 주 40시간을 초과해 계약해도 주휴수당은 8시간분까지만 발생합니다. 초과 근무분은 연장근로수당으로 별도 계산해야 합니다.',
+  },
+];
+---
+<BaseLayout
+  title="주휴 포함 시급 계산기 (2026년)"
+  description="2026년 최저시급 10,320원 기준으로 주휴수당을 포함한 월급과 실질 시급을 계산하세요. 주 근로시간별 주휴수당과 월 환산액을 바로 확인할 수 있습니다."
+  keywords="주휴수당 계산기, 주휴 포함 시급, 2026 최저시급 월급, 알바 월급 계산기"
+  path="/hourly-wage/"
+  jsonLd={faqJsonLd(faqs, `${SITE_URL}/hourly-wage/`)}
+>
+  <p class="breadcrumb"><a href="/calculator-hub/">홈</a> &gt; 주휴 포함 시급 계산기</p>
+  <h1 class="page-title">주휴 포함 시급 계산기 (2026년)</h1>
+  <p class="page-desc">시급과 주 근로시간을 입력하면 주휴수당, 월 환산 시간, 세전 월급을 계산해 드립니다.</p>
+  <p class="updated">2026년 최저시급 10,320원 적용 · 최종 업데이트 2026-09-29</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label for="wage">시급 (원)</label>
+      <input id="wage" type="number" value="10320" min="0" />
+      <div class="hint">2026년 최저시급 10,320원</div>
+    </div>
+    <div class="field">
+      <label for="hours">주 소정근로시간</label>
+      <input id="hours" type="number" value="40" min="0" max="80" />
+      <div class="hint">주 15시간 이상 + 개근 시 주휴수당 발생</div>
+    </div>
+    <button class="btn" id="calc-btn">월급 계산하기</button>
+
+    <div class="result" id="result">
+      <div>세전 월급 (주휴수당 포함)</div>
+      <div class="big" id="r-pay">-</div>
+      <table>
+        <tr><th>항목</th><th>금액</th></tr>
+        <tr><td>주휴시간 (주)</td><td id="r-leave-h">-</td></tr>
+        <tr><td>주휴수당 (주)</td><td id="r-leave-pay">-</td></tr>
+        <tr><td>월 환산 시간</td><td id="r-month-h">-</td></tr>
+        <tr><td>주휴 포함 실질 시급</td><td id="r-eff">-</td></tr>
+      </table>
+      <p class="note" id="r-note"></p>
+    </div>
+  </section>
+
+  <script>
+    import { calcHourlyWage } from '../../lib/hourly-wage.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    $('calc-btn').addEventListener('click', () => {
+      const r = calcHourlyWage({ hourlyWage: num('wage'), weeklyHours: num('hours') });
+      $('r-pay').textContent = fmt(r.monthlyPay);
+      $('r-leave-h').textContent = r.hasLeavePay ? r.leaveHours + '시간' : '없음 (주 15시간 미만)';
+      $('r-leave-pay').textContent = r.hasLeavePay ? fmt(r.weeklyLeavePay) : '-';
+      $('r-month-h').textContent = r.monthlyHours + '시간';
+      $('r-eff').textContent = fmt(r.effectiveHourly);
+      $('r-note').textContent = r.belowMinimum
+        ? '⚠️ 입력한 시급이 2026년 최저시급(10,320원)보다 낮습니다. 최저임금법 위반에 해당할 수 있습니다.'
+        : (!r.hasLeavePay
+          ? '주 15시간 미만 근무라 주휴수당이 발생하지 않습니다.'
+          : '주휴수당을 포함하면 실질 시급이 약 20% 높아집니다.');
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>계산 방법</h2>
+    <p>주휴시간 = (주 소정근로시간 ÷ 40) × 8시간 (상한 8시간, 주 15시간 미만이면 0). 월급은 아래 공식으로 구합니다.</p>
+    <table class="rate">
+      <tr><th>구분</th><th>계산식</th><th>주 40시간 예시 (2026년)</th></tr>
+      <tr><td>주휴수당</td><td>주휴시간 × 시급</td><td>8시간 × 10,320원 = 82,560원</td></tr>
+      <tr><td>월 환산 시간</td><td>(주 근로시간 + 주휴시간) × 4.345주</td><td>48 × 4.345 ≈ 209시간</td></tr>
+      <tr><td>세전 월급</td><td>월 환산 시간 × 시급</td><td>209 × 10,320원 = 2,156,880원</td></tr>
+    </table>
+    <h2>꼭 알아두세요</h2>
+    <ul>
+      <li>주휴수당은 <strong>주 15시간 이상 + 개근</strong>이 조건입니다. 하나라도 빠지면 못 받습니다.</li>
+      <li>이 계산기는 세전 월급입니다. 4대보험·세금을 떼면 실수령액은 약 192만원 수준(최저임금 기준)입니다.</li>
+      <li>수습 3개월은 최저임금의 90%까지 감액 가능하지만 단순노무직 등은 예외입니다.</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+
+  <section class="related">
+    <h2>관련 계산기</h2>
+    <div class="grid">
+      <a class="card" href="/calculator-hub/salary/"><h3>연봉 실수령액 계산기</h3><p>4대보험·세금 공제 내역</p></a>
+      <a class="card" href="/calculator-hub/severance/"><h3>퇴직금 계산기</h3><p>알바 퇴직금도 계산 가능</p></a>
+      <a class="card" href="/calculator-hub/freelancer/"><h3>프리랜서 3.3% 계산기</h3><p>원천징수 후 실수령액</p></a>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,138 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Faq from '../../components/Faq.astro';
+import { faqJsonLd, SITE_URL } from '../../lib/seo.js';
+
+const faqs = [
+  {
+    q: '연금으로 받으려면 어떤 조건이 필요한가요?',
+    a: '만 55세 이상이어야 하고, IRP 계좌에 퇴직금을 이체한 뒤 연금 형태로 수령해야 합니다. 연금 수령을 선택하면 퇴직소득세 납부가 수령 시점까지 미뤄지는 과세이연 혜택도 받습니다.',
+  },
+  {
+    q: '감면율은 수령 기간에 따라 어떻게 달라지나요?',
+    a: '1~10년차 수령분은 연금외수령 원천징수세율의 70%(30% 감면), 11~20년차는 60%(40% 감면), 21년차 이후는 50%(50% 감면)가 적용됩니다. 수령 기간이 길수록 후반부 감면율이 높아져 절세 효과가 커집니다.',
+  },
+  {
+    q: 'IRP에서 굴린 운용수익의 세금은 어떻게 되나요?',
+    a: '일시금으로 찾으면 운용수익에 기타소득세 16.5%가 붙지만, 연금으로 받으면 수령 개시 나이에 따라 5.5%(55~69세), 4.4%(70~79세), 3.3%(80세 이상)의 연금소득세만 냅니다.',
+  },
+  {
+    q: '연금 수령이 항상 유리한가요?',
+    a: '대체로 유리하지만 예외가 있습니다. 연금소득이 연 1,500만원을 초과하면 종합소득세 신고 대상이 될 수 있고, 당장 목돈이 필요하면 유동성이 떨어집니다. 퇴직금이 3,000만원 이하로 적고 목돈이 급하다면 일시금도 검토해 볼 만합니다.',
+  },
+  {
+    q: '이 계산기의 퇴직소득세는 정확한가요?',
+    a: '세법상 연평균과세 공식(근속연수공제 → 환산급여공제 → 기본세율)으로 계산한 추정치입니다. 실제 세액은 근속연수 산정(월 단위) 등에 따라 달라질 수 있으니 국세청 퇴직소득세 계산기로 교차 확인하세요.',
+  },
+];
+---
+<BaseLayout
+  title="IRP 일시금 vs 연금 수령 세금 비교 계산기"
+  description="퇴직금을 IRP에서 일시금으로 받을 때와 연금으로 받을 때의 세금을 비교하세요. 수령 기간별 감면율(30~50%)과 운용수익 과세 차이까지 계산합니다."
+  keywords="IRP 일시금 연금 세금, 퇴직금 연금 수령 절세, IRP 세금 비교, 퇴직소득세 감면"
+  path="/irp/"
+  jsonLd={faqJsonLd(faqs, `${SITE_URL}/irp/`)}
+>
+  <p class="breadcrumb"><a href="/calculator-hub/">홈</a> &gt; IRP 세금 비교 계산기</p>
+  <h1 class="page-title">IRP 일시금 vs 연금 수령 세금 비교</h1>
+  <p class="page-desc">퇴직금을 한 번에 받을 때와 IRP에서 연금으로 나눠 받을 때, 세금이 얼마나 다른지 계산해 드립니다.</p>
+  <p class="updated">2026년 세법 기준 적용 · 최종 업데이트 2026-09-29</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label for="gross">퇴직금 총액 (만원)</label>
+      <input id="gross" type="number" value="10000" min="0" />
+    </div>
+    <div class="field">
+      <label for="tenure">근속연수 (년)</label>
+      <input id="tenure" type="number" value="10" min="0" />
+    </div>
+    <div class="field">
+      <label for="years">연금 수령 기간 (년)</label>
+      <input id="years" type="number" value="10" min="0" />
+      <div class="hint">균등 분할 수령 가정. 길수록 감면율이 높아집니다</div>
+    </div>
+    <div class="field">
+      <label for="age">연금 수령 개시 나이 (만)</label>
+      <input id="age" type="number" value="60" min="0" />
+      <div class="hint">만 55세 이상부터 연금 수령 가능</div>
+    </div>
+    <div class="field">
+      <label for="earn">IRP 내 운용수익·세액공제분 (만원, 선택)</label>
+      <input id="earn" type="number" value="0" min="0" />
+      <div class="hint">없으면 0으로 두세요</div>
+    </div>
+    <button class="btn" id="calc-btn">세금 비교하기</button>
+
+    <div class="result" id="result">
+      <div>총 절세액 (원금 + 운용수익)</div>
+      <div class="big" id="r-saving">-</div>
+      <table>
+        <tr><th>구분</th><th>일시금 수령</th><th>연금 수령</th></tr>
+        <tr><td>퇴직금 원금 세금</td><td id="r-lump">-</td><td id="r-pension">-</td></tr>
+        <tr><td>원금 실수령액</td><td id="r-lump-net">-</td><td id="r-pension-net">-</td></tr>
+        <tr><td>운용수익분 세금</td><td id="r-earn-lump">-</td><td id="r-earn-pension">-</td></tr>
+      </table>
+      <p class="note" id="r-note"></p>
+    </div>
+  </section>
+
+  <script>
+    import { calcIrp } from '../../lib/irp.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    $('calc-btn').addEventListener('click', () => {
+      const v = calcIrp({
+        severanceGross: num('gross') * 10000,
+        tenureYears: num('tenure'),
+        pensionYears: num('years'),
+        startAge: Math.floor(num('age')),
+        extraEarnings: num('earn') * 10000,
+      });
+      $('r-saving').textContent = fmt(v.totalSaving);
+      $('r-lump').textContent = fmt(v.lumpTax);
+      $('r-pension').textContent = fmt(v.pensionTax) + ` (실효 ${v.effRate}%)`;
+      $('r-lump-net').textContent = fmt(v.lumpNet);
+      $('r-pension-net').textContent = fmt(v.pensionNet);
+      $('r-earn-lump').textContent = fmt(v.earnLumpTax) + ' (16.5%)';
+      $('r-earn-pension').textContent = fmt(v.earnPensionTax) + ` (${v.earnRatePct}%)`;
+      $('r-note').textContent = !v.pensionEligible
+        ? '만 55세 미만은 연금 수령이 불가해 일시금 기준으로만 표시됩니다. 개시 나이를 55세 이상으로 입력해 보세요.'
+        : `${v.pensionYears}년 연금 수령 시 퇴직소득세가 ${100 - v.effRate}% 감면됩니다. 연금소득 연 1,500만원 초과 시 종합과세 대상이 될 수 있습니다.`;
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>계산 방법</h2>
+    <p>퇴직소득세는 세법상 연평균과세 공식으로 먼저 구한 뒤, 수령 방식별 세율을 적용합니다.</p>
+    <table class="rate">
+      <tr><th>수령 방식</th><th>퇴직금 원금 세율</th><th>운용수익 세율</th></tr>
+      <tr><td>일시금</td><td>퇴직소득세 100%</td><td>기타소득세 16.5%</td></tr>
+      <tr><td>연금 1~10년차</td><td>70% (30% 감면)</td><td>연금소득세 3.3~5.5%</td></tr>
+      <tr><td>연금 11~20년차</td><td>60% (40% 감면)</td><td>연금소득세 3.3~5.5%</td></tr>
+      <tr><td>연금 21년차~</td><td>50% (50% 감면)</td><td>연금소득세 3.3~5.5%</td></tr>
+    </table>
+    <p>연금소득세율은 수령 개시 나이에 따라 55~69세 5.5%, 70~79세 4.4%, 80세 이상 3.3%가 적용됩니다. 지방소득세(세액의 10%)는 양쪽 모두에 포함되어 있습니다.</p>
+    <h2>꼭 알아두세요</h2>
+    <ul>
+      <li>IRP로 퇴직금을 이체하면 연금 수령 시점까지 퇴직소득세 납부가 미뤄집니다(과세이연).</li>
+      <li>감면율은 수령 연차별로 차등 적용되므로, 균등 분할 기준 가중평균으로 계산했습니다.</li>
+      <li>연금소득이 연 1,500만원을 초과하면 종합소득세 신고 대상이 될 수 있습니다.</li>
+      <li>건강보험료 측면에서도 연금 분할 수령이 유리할 수 있습니다.</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+
+  <section class="related">
+    <h2>관련 계산기</h2>
+    <div class="grid">
+      <a class="card" href="/calculator-hub/severance/"><h3>퇴직금 계산기</h3><p>세후 실수령액까지 계산</p></a>
+      <a class="card" href="/calculator-hub/salary/"><h3>연봉 실수령액 계산기</h3><p>2026년 최신 요율 반영</p></a>
+      <a class="card" href="/calculator-hub/monthly-rent/"><h3>월세 세액공제 계산기</h3><p>연 1,000만원 한도</p></a>
+    </div>
+  </section>
+</BaseLayout>

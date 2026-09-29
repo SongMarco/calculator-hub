@@ -4,8 +4,9 @@ interface Props {
   description: string;
   keywords?: string;
   path?: string;
+  jsonLd?: Record<string, unknown>;
 }
-const { title, description, keywords = '', path = '/' } = Astro.props;
+const { title, description, keywords = '', path = '/', jsonLd } = Astro.props;
 const siteName = '계산기허브';
 const fullTitle = `${title} | ${siteName}`;
 import '../styles/global.css';
@@ -23,6 +24,7 @@ import '../styles/global.css';
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={description} />
   <meta name="robots" content="index, follow" />
+  {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>" />
 </head>
 <body>
@@ -32,6 +34,9 @@ import '../styles/global.css';
       <nav class="nav">
         <a href="/calculator-hub/salary/">연봉 실수령액</a>
         <a href="/calculator-hub/severance/">퇴직금</a>
+        <a href="/calculator-hub/monthly-rent/">월세 세액공제</a>
+        <a href="/calculator-hub/irp/">IRP 세금비교</a>
+        <a href="/calculator-hub/hourly-wage/">주휴 시급</a>
         <a href="/calculator-hub/dsr/">DSR</a>
       </nav>
     </div>

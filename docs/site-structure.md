@@ -1,4 +1,4 @@
-# 사이트 구조 설계 (Phase 1)
+# 사이트 구조 설계 (Phase 2)
 
 ## URL 맵
 
@@ -10,6 +10,9 @@
 | `/freelancer/` | 프리랜서 3.3% 계산기 | ✅ |
 | `/parental/` | 2026년 육아휴직 급여 계산기 | ✅ |
 | `/dsr/` | DSR·스트레스 DSR 계산기 | ✅ |
+| `/monthly-rent/` | 2026년 월세 세액공제 한도 계산기 | ✅ (Phase 2) |
+| `/irp/` | IRP 일시금 vs 연금 수령 세금 비교 | ✅ (Phase 2) |
+| `/hourly-wage/` | 주휴 포함 시급 계산기 (2026년) | ✅ (Phase 2) |
 
 ### URL 설계 원칙
 - 한국어 키워드를 영문 slug로 매핑 (`salary`, `severance`, `freelancer`, `parental`, `dsr`)
@@ -53,7 +56,10 @@
 - `meta description`: 120~155자, "2026년" 등 시의성 키워드 포함
 - `og:*` 기본 포함, `robots: index, follow`
 - lang="ko", 시맨틱 태그 (h1 단일, h2 섹션)
-- TODO: `astro-sitemap` + `robots.txt` 추가, JSON-LD FAQ 스키마 (Phase 2)
+- FAQ JSON-LD: 전 계산기 페이지에 `FAQPage` 스키마 삽입 (`src/lib/seo.js`의 `faqJsonLd`, BaseLayout `jsonLd` prop)
+- `public/sitemap.xml`: 허브 + 8개 계산기, `public/robots.txt` (사이트맵 링크 포함)
+- GitHub Pages 배포 기준 canonical: `https://songmarco.github.io/calculator-hub/...`
+  (내부 링크는 `/calculator-hub/` prefix 필수 — Astro `base` 설정과 일치)
 
 ## AdSense 계획
 
@@ -70,11 +76,20 @@
 | 프리랜서 3.3% | 원천징수세율 | 국세청 | 세율 변경 시 (드묾) |
 | 육아휴직 급여 | 지급 기준·상한 | 고용노동부 | 매년 1월 |
 | DSR | 스트레스 금리 | 금융위원회·은행연합회 | 반기 (1월·7월) |
+| 월세 세액공제 | 공제율·한도·소득 기준 | 국세청 (소득세법, 연말정산) | 매년 1월 (세법 개정 시 즉시) |
+| IRP 세금 비교 | 연금외수령 감면율·연금소득세율 | 국세청 (소득세법 제129조) | 세법 개정 시 |
+| 주휴 포함 시급 | 최저임금·주휴수당 | 고용노동부 (최저임금 고시) | 매년 1월 |
 
-## 확장 계획 (Phase 2)
+## 확장 계획 (Phase 2) — 완료
 
-1. 키워드 리서치 결과(`docs/keywords.md`) 기준 롱테일 페이지 추가
-2. FAQ JSON-LD 스키마, sitemap, robots.txt
-3. 정책 워처 (주 1회): 요율·세법 변경 감지 → 이슈 생성
-4. SEO 닥터 (주 1회): Search Console 기반 순위 분석
-5. 수익 리포터 (월 1회): AdSense 리포트
+1. ~~키워드 리서치 결과(`docs/keywords.md`) 기준 롱테일 페이지 추가~~ → 월세 세액공제·IRP·주휴 시급 3종 추가 ✅
+2. ~~FAQ JSON-LD 스키마, sitemap, robots.txt~~ ✅
+3. 정책 워처 (주 1회): 요율·세법 변경 감지 → 이 채팅에 보고 (변경 있을 때만)
+4. SEO 닥터 (주 1회): 키워드 노출 현황 점검 → 이 채팅에 보고
+5. 수익 리포터 (월 1회): AdSense 미연동 시 연동 필요 알림
+
+## 확장 계획 (Phase 3 후보)
+
+- 남은 우선 키워드 계산기 추가 (3.3% 환급금, 생애최초 취득세 감면, 단순경비율 vs 기준경비율 등)
+- Search Console 연동 후 실측 기반 SEO 닥터 고도화
+- AdSense 승인 후 광고 슬롯 활성화 (`ca-pub-XXXX` 교체)

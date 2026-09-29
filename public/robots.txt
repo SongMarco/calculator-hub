@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://songmarco.github.io/calculator-hub/sitemap.xml

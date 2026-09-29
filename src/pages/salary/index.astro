@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Faq from '../../components/Faq.astro';
+import { faqJsonLd, SITE_URL } from '../../lib/seo.js';
 
 const faqs = [
   {
@@ -30,6 +31,7 @@ const faqs = [
   description="2026년 최신 요율(국민연금 4.75%, 건강보험 3.595%)로 연봉 실수령액을 계산하세요. 4대보험과 소득세 공제 내역을 한눈에 보여줍니다."
   keywords="2026 연봉 실수령액, 월급 실수령액 계산기, 4대보험 계산, 연봉 5000 실수령액"
   path="/salary/"
+  jsonLd={faqJsonLd(faqs, `${SITE_URL}/salary/`)}
 >
   <p class="breadcrumb"><a href="/calculator-hub/">홈</a> &gt; 연봉 실수령액 계산기</p>
   <h1 class="page-title">2026년 연봉 실수령액 계산기</h1>

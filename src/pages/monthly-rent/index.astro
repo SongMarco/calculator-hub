@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Faq from '../../components/Faq.astro';
+import { faqJsonLd, SITE_URL } from '../../lib/seo.js';
+
+const faqs = [
+  {
+    q: '월세 세액공제를 받으려면 어떤 조건을 충족해야 하나요?',
+    a: '총급여 8,000만원 이하(종합소득금액 7,000만원 이하)의 무주택 세대주여야 하고, 임차 주택이 국민주택규모(85㎡) 이하 또는 기준시가 4억원 이하여야 합니다. 임대차계약서상 주소와 주민등록상 주소가 같아야 해서 전입신고는 필수입니다.',
+  },
+  {
+    q: '공제율 17%와 15%는 어떻게 갈리나요?',
+    a: '총급여 5,500만원 이하면 17%, 5,500만원 초과~8,000만원 이하면 15%가 적용됩니다. 연간 월세 한도 1,000만원 기준 최대 환급액은 각각 170만원, 150만원입니다. 총급여가 8,000만원을 1원이라도 초과하면 공제 대상에서 완전히 제외됩니다.',
+  },
+  {
+    q: '계산된 공제액보다 결정세액이 작으면 어떻게 되나요?',
+    a: '세액공제는 산출된 세금(결정세액)을 초과할 수 없습니다. 공제액이 120만원인데 결정세액이 80만원이면 실제 환급은 80만원까지만 됩니다. 결정세액을 입력하면 실제 환급 예상액을 함께 보여드립니다.',
+  },
+  {
+    q: '집주인 동의가 필요한가요?',
+    a: '필요 없습니다. 월세 세액공제는 임차인의 정당한 권리라 집주인이 몰라도 신청할 수 있습니다. 주민등록등본, 임대차계약서 사본, 월세 이체 증빙 3가지만 준비하면 됩니다.',
+  },
+  {
+    q: '연말정산을 놓쳤는데 소급 신청이 되나요?',
+    a: '네. 국세청 홈택스 경정청구로 지난 5년치까지 소급 신청할 수 있습니다. 계약서와 송금 내역만 보관되어 있다면 이사 후에도 비대면으로 청구 가능합니다.',
+  },
+];
+---
+<BaseLayout
+  title="2026년 월세 세액공제 한도 계산기"
+  description="2026년 기준 월세 세액공제 한도(연 1,000만원)와 공제율(17%·15%)로 내 환급액을 계산하세요. 총급여 구간별 공제액을 바로 확인할 수 있습니다."
+  keywords="월세 세액공제 계산기, 2026 월세 세액공제 한도, 월세 환급액 계산, 연말정산 월세공제"
+  path="/monthly-rent/"
+  jsonLd={faqJsonLd(faqs, `${SITE_URL}/monthly-rent/`)}
+>
+  <p class="breadcrumb"><a href="/calculator-hub/">홈</a> &gt; 월세 세액공제 계산기</p>
+  <h1 class="page-title">2026년 월세 세액공제 한도 계산기</h1>
+  <p class="page-desc">월세와 총급여를 입력하면 2026년 기준 세액공제액과 예상 환급액을 계산해 드립니다.</p>
+  <p class="updated">2026년 연말정산 기준 적용 · 최종 업데이트 2026-09-29</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label for="rent">월세 (만원/월)</label>
+      <input id="rent" type="number" value="60" min="0" />
+    </div>
+    <div class="field">
+      <label for="salary">총급여 (만원/년)</label>
+      <input id="salary" type="number" value="5000" min="0" />
+      <div class="hint">세전 연봉에서 비과세소득(식대 등)을 뺀 금액</div>
+    </div>
+    <div class="field">
+      <label><input id="eligible" type="checkbox" checked /> 무주택 세대주이며 전입신고를 완료함</label>
+      <div class="hint">미충족 시 공제 불가 (국민주택규모 85㎡ 이하 또는 기준시가 4억원 이하 주택)</div>
+    </div>
+    <div class="field">
+      <label for="dtax">연간 결정세액 (만원, 선택)</label>
+      <input id="dtax" type="number" value="0" min="0" />
+      <div class="hint">알면 입력하세요. 세액공제는 결정세액을 초과할 수 없습니다</div>
+    </div>
+    <button class="btn" id="calc-btn">공제액 계산하기</button>
+
+    <div class="result" id="result">
+      <div>예상 세액공제액 (연간)</div>
+      <div class="big" id="r-credit">-</div>
+      <table>
+        <tr><th>항목</th><th>금액</th></tr>
+        <tr><td>적용 공제율</td><td id="r-rate">-</td></tr>
+        <tr><td>공제 대상 월세 (연간, 한도 적용)</td><td id="r-base">-</td></tr>
+        <tr><td>예상 환급액</td><td id="r-refund">-</td></tr>
+      </table>
+      <p class="note" id="r-note"></p>
+    </div>
+  </section>
+
+  <script>
+    import { calcRentCredit } from '../../lib/monthly-rent.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    $('calc-btn').addEventListener('click', () => {
+      const r = calcRentCredit({
+        monthlyRent: num('rent') * 10000,
+        totalSalary: num('salary') * 10000,
+        eligible: $('eligible').checked,
+        determinedTax: num('dtax') * 10000,
+      });
+      $('r-credit').textContent = fmt(r.credit);
+      $('r-rate').textContent = r.eligible ? r.ratePct + '%' : '공제 대상 아님';
+      $('r-base').textContent = fmt(r.cappedBase) + (r.capped ? ' (연 1,000만원 한도 적용)' : '');
+      $('r-refund').textContent = fmt(r.refund);
+      $('r-note').textContent = !r.eligible
+        ? '총급여 8,000만원 초과 또는 자격 요건 미충족으로 공제 대상이 아닙니다.'
+        : (num('dtax') > 0 && r.refund < r.credit
+          ? '결정세액이 공제액보다 작아 실제 환급은 결정세액까지만 됩니다.'
+          : '세액공제는 산출된 세금에서 직접 차감되므로 절세 효과가 큽니다.');
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>계산 방법</h2>
+    <p>공제액 = min(연간 월세액, 1,000만원) × 공제율. 2026년 연말정산 기준 요율은 다음과 같습니다.</p>
+    <table class="rate">
+      <tr><th>총급여 구간</th><th>공제율</th><th>연간 한도</th><th>최대 환급액</th></tr>
+      <tr><td>5,500만원 이하</td><td>17%</td><td>1,000만원</td><td>170만원</td></tr>
+      <tr><td>5,500만원 초과 ~ 8,000만원 이하</td><td>15%</td><td>1,000만원</td><td>150만원</td></tr>
+      <tr><td>8,000만원 초과</td><td>공제 불가</td><td>-</td><td>0원</td></tr>
+    </table>
+    <p>사업소득이 있는 경우 종합소득금액 7,000만원 이하 기준이 적용됩니다.</p>
+    <h2>꼭 알아두세요</h2>
+    <ul>
+      <li>월세 세액공제는 소득공제가 아니라 <strong>세액공제</strong>라 산출세금에서 직접 차감됩니다.</li>
+      <li>전입신고를 하지 않으면 공제를 받을 수 없습니다. 이사 당일 신고가 안전합니다.</li>
+      <li>집주인의 동의나 확정일자는 필수 요건이 아닙니다.</li>
+      <li>연말정산을 놓쳤다면 홈택스 경정청구로 5년치까지 소급 신청할 수 있습니다.</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+
+  <section class="related">
+    <h2>관련 계산기</h2>
+    <div class="grid">
+      <a class="card" href="/calculator-hub/salary/"><h3>연봉 실수령액 계산기</h3><p>2026년 최신 요율 반영</p></a>
+      <a class="card" href="/calculator-hub/severance/"><h3>퇴직금 계산기</h3><p>세후 실수령액까지 계산</p></a>
+      <a class="card" href="/calculator-hub/irp/"><h3>IRP 세금 비교 계산기</h3><p>일시금 vs 연금 수령</p></a>
+    </div>
+  </section>
+</BaseLayout>
