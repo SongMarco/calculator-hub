@@ -429,6 +429,17 @@ img { max-width: 100%; }
 }
 .radio-row input[type="radio"] { width: 18px; height: 18px; accent-color: var(--brand); margin: 0; }
 
+/* ---------- pill 버튼 (근무조 선택 등) ---------- */
+.radio-row .pill {
+  min-height: 44px; padding: 8px 16px;
+  border: 1.5px solid var(--line); border-radius: 999px;
+  font-size: .95rem; font-weight: 600; color: var(--muted);
+  cursor: pointer; background: #fff;
+}
+.radio-row .pill[aria-pressed="true"] {
+  border-color: var(--brand); color: var(--brand-strong); background: var(--brand-soft);
+}
+
 /* ---------- article 표 가로 스크롤 (모바일) ---------- */
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 14px -4px; padding: 0 4px; }
 .table-scroll table { min-width: 460px; }

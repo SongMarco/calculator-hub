@@ -1,0 +1,178 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { u } from '../../lib/paths.js';
+import Faq from '../../components/Faq.astro';
+import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
+import { SHIFTS } from '../../lib/coupang-night.js';
+
+const faqs = [
+  {
+    q: '야간수당은 누구나 받을 수 있나요?',
+    a: '5인 이상 사업장에서 22:00~익일 06:00에 일한 시간에 대해 통상임금의 50%를 가산해 받을 수 있습니다. 쿠팡 물류센터는 대규모 사업장이라 이 규정이 적용됩니다.',
+  },
+  {
+    q: '공고에 "야간 시급 15,000원"이라고 적혀 있는데 시급이 오른 건가요?',
+    a: '대부분 시급 자체가 오른 게 아니라 야간가산이 포함된 금액입니다. 이 계산기에 공고의 근무 시간대를 넣어 실제 일급을 검증해 보세요. 완전 야간조(22:00~06:00) 8시간이면 시급 10,320원 기준 일급 약 108,360원(휴게 60분 제외 시)입니다.',
+  },
+  {
+    q: '휴게시간도 돈으로 받나요?',
+    a: '휴게시간은 근로시간이 아니라 임금 계산에서 제외됩니다. 이 계산기는 휴게시간을 야간·주간에 비례 배분한 간이 계산이므로, 실제와 소액 차이가 날 수 있습니다.',
+  },
+  {
+    q: '주휴수당은 별도로 받나요?',
+    a: '1주 15시간 이상 근무하면 주휴수당을 별도로 받을 수 있습니다. 다만 쿠팡 단기 알바는 일용직 계약이 많아 조건이 다르니 근로계약서와 출근 확정 문자를 확인하세요.',
+  },
+  {
+    q: '세금·4대보험은 얼마나 떼이나요?',
+    a: '일용직은 소득세 3.3%가 원천징수될 수 있고, 고용보험·국민연금 등은 근무 조건에 따라 다릅니다. 이 계산기는 세전·공제 전 기준이니 실수령액은 공제 후 금액과 다릅니다.',
+  },
+  {
+    q: '이 계산기로 알 수 없는 것은 뭔가요?',
+    a: '공정수당·인센티브, 센터별 프로모션 급여, 주휴수당, 실제 세금·4대보험 공제액은 반영하지 않습니다. 정확한 지급액은 쿠펀치 앱의 급여 명세와 센터 공고를 기준으로 확인하세요.',
+  },
+];
+---
+<BaseLayout
+  title="쿠팡 야간 일급 계산기"
+  description="쿠팡 물류센터 근무조별 일급을 계산하세요. 주간·오후·심야·완전야간조 프리셋과 야간수당 50% 가산 기준."
+  keywords="쿠팡 야간 일급 계산기, 쿠팡 알바 야간수당, 물류센터 야간조 일급, 쿠팡 심야조 급여"
+  path="/coupang-night/"
+  ogImage="/images/card-overtime.webp"
+  jsonLd={faqJsonLd(faqs, pageUrl("/coupang-night/"))}
+>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; 쿠팡 야간 일급 계산기</p>
+  <h1 class="page-title">쿠팡 야간 일급 계산기</h1>
+  <p class="page-desc">근무조를 고르거나 출퇴근 시간을 직접 입력하면 야간수당이 붙은 실제 일급을 계산해 드립니다.</p>
+  <p class="updated">근로기준법 야간 50% 가산 기준 · 최종 업데이트 2026-09-30</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label>근무조 선택</label>
+      <div class="radio-row" id="shift-row">
+        {SHIFTS.map((s, i) => (
+          <button type="button" class="pill" data-shift={s.id} aria-pressed={i === 3 ? 'true' : 'false'}>{s.name}</button>
+        ))}
+        <button type="button" class="pill" data-shift="custom" aria-pressed="false">직접 입력</button>
+      </div>
+      <div class="hint" id="shift-desc">22:00~익일 06:00 · 전 시간 야간</div>
+    </div>
+    <div class="field" id="custom-time" hidden>
+      <label for="start">출근 시각</label>
+      <input id="start" type="time" value="22:00" />
+      <label for="end" style="margin-top:8px">퇴근 시각</label>
+      <input id="end" type="time" value="06:00" />
+      <div class="hint">퇴근이 출근보다 이르면 익일로 계산합니다</div>
+    </div>
+    <div class="field">
+      <label for="wage">시급 (원)</label>
+      <input id="wage" type="number" inputmode="decimal" value="10320" min="0" />
+      <div class="hint">2026년 최저시급 10,320원 · 공고 시급을 그대로 입력하세요</div>
+    </div>
+    <div class="field">
+      <label for="break">휴게시간 (분)</label>
+      <input id="break" type="number" inputmode="decimal" value="60" min="0" />
+      <div class="hint">휴게시간은 임금 계산에서 제외됩니다</div>
+    </div>
+    <div class="field">
+      <label for="days">월 근무일수 (일)</label>
+      <input id="days" type="number" inputmode="decimal" value="22" min="0" />
+      <div class="hint">월 예상 급여 계산용 (0이면 표시 안 함)</div>
+    </div>
+    <button class="btn" id="calc-btn">일급 계산하기</button>
+
+    <div class="result" id="result">
+      <div>예상 일급 (세전)</div>
+      <div class="big" id="r-total">-</div>
+      <table>
+        <tr><th>항목</th><th>시간</th><th>금액</th></tr>
+        <tbody id="r-rows"></tbody>
+      </table>
+      <p class="note" id="r-monthly"></p>
+      <p class="note">세전·공제 전 추정치입니다. 휴게시간은 야간·주간에 비례 배분한 간이 계산이며, 공정수당·인센티브·주휴수당은 포함되지 않습니다.</p>
+    </div>
+  </section>
+
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
+
+  <script>
+    import { calcCoupangPay, SHIFTS } from '../../lib/coupang-night.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    const toMin = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + (m || 0); };
+    const shiftsById = Object.fromEntries(SHIFTS.map((s) => [s.id, s]));
+    let currentShift = 'fullnight';
+
+    const pills = [...document.querySelectorAll('#shift-row .pill')];
+    pills.forEach((p) => p.addEventListener('click', () => {
+      pills.forEach((x) => x.setAttribute('aria-pressed', 'false'));
+      p.setAttribute('aria-pressed', 'true');
+      currentShift = p.dataset.shift;
+      $('custom-time').hidden = currentShift !== 'custom';
+      $('shift-desc').textContent = currentShift === 'custom'
+        ? '출퇴근 시간을 직접 입력하세요'
+        : shiftsById[currentShift].desc;
+    }));
+
+    $('calc-btn').addEventListener('click', () => {
+      let startMin, endMin, breakMin;
+      if (currentShift === 'custom') {
+        startMin = toMin($('start').value || '22:00');
+        endMin = toMin($('end').value || '06:00');
+        breakMin = num('break');
+      } else {
+        const s = shiftsById[currentShift];
+        startMin = s.startMin; endMin = s.endMin; breakMin = s.breakMin;
+        $('break').value = s.breakMin;
+      }
+      const r = calcCoupangPay({ hourlyWage: num('wage'), startMin, endMin, breakMin, workDays: num('days') });
+      const hfmt = (h) => (Math.round(h * 10) / 10) + '시간';
+      $('r-total').textContent = fmt(r.dailyTotal);
+      $('r-rows').innerHTML =
+        `<tr><td>기본급 (실근로 ${hfmt(r.workHours)})</td><td>${hfmt(r.workHours)}</td><td>${fmt(r.basePay)}</td></tr>` +
+        `<tr><td>야간가산 (야간 ${hfmt(r.nightHours)} × 50%)</td><td>${hfmt(r.nightHours)}</td><td>+${fmt(r.nightBonus)}</td></tr>`;
+      $('r-monthly').textContent = r.workDays > 0
+        ? `월 ${r.workDays}일 근무 시 예상 월급 약 ${fmt(r.monthly)} (세전)`
+        : '';
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>📖 쿠팡 근무조별 일급 정리</h2>
+    <div class="example-box"><strong>💡 예시로 이해하기</strong><br>완전 야간조(22:00~06:00)에 휴게 60분, 시급 10,320원이면 실근로 7시간 중 7시간이 야간에 해당합니다. 기본급 72,240원 + 야간가산 36,120원 = <strong>일급 108,360원</strong>(세전)입니다.</div>
+    <div class="table-scroll">
+    <table>
+      <tr><th>근무조</th><th>시간대</th><th>야간 포함</th><th>일급 (세전)</th></tr>
+      <tr><td>주간조</td><td>09:00~18:00</td><td>0시간</td><td>82,560원</td></tr>
+      <tr><td>오후조</td><td>14:00~23:00</td><td>약 0.9시간</td><td>87,146원</td></tr>
+      <tr><td>심야조</td><td>19:00~익일 04:00</td><td>약 5.3시간</td><td>110,080원</td></tr>
+      <tr><td>완전 야간조</td><td>22:00~익일 06:00</td><td>7시간</td><td>108,360원</td></tr>
+    </table>
+    </div>
+    <p class="note">시급 10,320원·휴게 60분 기준, 세전 추정치. 심야조가 완전 야간조보다 일급이 높은 건 근무 시간이 1시간 더 길기 때문입니다.</p>
+    <h3>꼭 알아두세요</h3>
+    <ul>
+      <li>야간수당은 <strong>22:00~익일 06:00</strong>에 일한 시간에만 붙습니다. "야간조 전체가 1.5배"가 아닙니다.</li>
+      <li>공고의 "야간 시급"은 야간가산이 포함된 금액인 경우가 많습니다. 시급 자체가 오른 게 아닙니다.</li>
+      <li><strong>휴게시간</strong>은 임금 계산에서 빠집니다. 휴게에도 자유롭지 못했다면 근로시간으로 볼 여지가 있습니다.</li>
+      <li>일급 외에 <strong>공정수당·인센티브</strong>가 붙는 센터도 있으니 공고의 "급여 구분"을 꼭 확인하세요.</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+  <GovSupport page="coupang-night" />
+
+  <section class="related">
+    <h2>관련 계산기</h2>
+    <div class="grid">
+      <a class="card" href={u("/overtime/")}><h3>연장·야간·휴일 수당 계산기</h3><p>시간외 가산수당 항목별 계산</p></a>
+      <a class="card" href={u("/hourly-wage/")}><h3>주휴 포함 시급 계산기</h3><p>주휴수당 포함 실질 시급</p></a>
+      <a class="card" href={u("/parttime-severance/")}><h3>알바 퇴직금 계산기</h3><p>받을 수 있는지 조건 체크</p></a>
+    </div>
+  </section>
+</BaseLayout>
