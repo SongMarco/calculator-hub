@@ -190,3 +190,10 @@
 - **papercut 스윕**: 전 페이지 자동 점검 — number input inputmode 누락 0건, FAQ/AdSlot 누락 0건, 모바일 테이블 2~3열은 스크롤 불필요 확인, 내부 링크 깨짐 0건. `.pill` 버튼 스타일 global.css에 추가 (근무조 선택용).
 - **정책 감시 인텔**: 2026 세제개편안에 프리랜서 원천징수세율 3.3%→2.2% 인하 포함 (2027-01-01 시행 예정, 국회 논의 중). 확정 시 /freelancer/·/refund33/ 로직 업데이트 필요 — 정책 워처에 추적 항목으로 전달 요망.
 - 검증: 테스트 139/139 (신규 10개), 빌드 23페이지 (Vercel 루트·GH Pages /calculator-hub/ 양쪽 검증), sitemap 포함, 내부 링크 0건 깨짐.
+
+## 2026-09-30 14:00 KST — 운영 QA (부모 에이전트 직접)
+- 실배포 전수 점검: sitemap-0.xml 22 URL 전부 HTTP 200 (calc.choronglight.com)
+- 발견·수정: 레포에 오래된 `public/sitemap.xml`이 잔존해 github.io URL을 서빙 중이었음 → GitHub API로 직접 삭제 (커밋 7e132f6). robots.txt는 sitemap-index.xml을 가리키므로 정상. 로컬 dist에는 없던 파일이라 빌드 검증에서 못 잡았음 — 교훈: 실배포 URL 기준 QA 필요.
+- GitHub Pages 미러도 200 정상, 광고 슬롯 포함 확인.
+- 정책 워처 cron에 프리랜서 원천징수 3.3%→2.2% 인하안(2027-01-01 예정, 국회 논의 중) 추적 항목 추가. 확정 시 /freelancer/·/refund33/ 로직 업데이트 필요.
+- Postmaster Tools에 news.calc.choronglight.com 등록·소유권 확인 완료 (Gmail 수신율 모니터링용).
