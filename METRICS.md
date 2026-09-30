@@ -6,7 +6,8 @@ North Star: 3개월 내 AdSense 월 300만원 (월 PV × RPM).
 | 지표 | 값 | 출처 | 비고 |
 |---|---|---|---|
 | 월 PV | ~0 | GA4 (G-9X0RGDJTGV) | 2026-09-30 설치, 데이터 수집 시작 |
-| AdSense 노출 (calc.choronglight.com) | 미검증 | AdSense 보고서 | 슬롯은 실ID로 교체됨, 노출 집계 확인 필요 |
+| AdSense 노출 (calc.choronglight.com) | 0 (보고서상 행 없음, 2026-09-30 확인) | AdSense 보고서 | 실광고 렌더링은 스크린샷으로 확인됨. 노출 집계는 상위 도메인 합산 또는 지연 가능 |
+| AdSense 계정 전체 (최근 7일) | 노출 54 · 클릭 0 · 예상 US$0.21 (PV 279) | AdSense 보고서 | 주로 tiny.choronglight.com(35)·choronglight.com(19) |
 | AdSense 잔고 | US$59.23 | AdSense 계정 | 지급 기준 $100 미달 |
 | 뉴스레터 실구독자 | 0 | Resend audience | 테스트 1건은 수신거부 상태 |
 | 뉴스레터 Gmail 도착률 | 0% (조용히 차단) | Gmail 확인 | 신규 도메인 워밍업 이슈, Postmaster 등록됨 |
