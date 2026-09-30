@@ -317,7 +317,7 @@ img { max-width: 100%; }
   background: #fff; margin: 14px 0; transition: opacity .2s, box-shadow .2s; box-shadow: var(--shadow-card);
 }
 .w-card.w-dim { opacity: .55; }
-.w-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.w-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; }
 .w-head h3 { margin: 0; font-size: 1.1rem; }
 .w-badge { flex: 0 0 auto; font-size: .82rem; font-weight: 800; border-radius: var(--pill); padding: 7px 14px; }
 .w-badge.w-neutral { background: var(--dim-bg); color: var(--muted); }
@@ -414,3 +414,37 @@ img { max-width: 100%; }
   color: var(--faint);
   margin-bottom: 8px;
 }
+
+/* ---------- 라디오 옵션 pill 버튼 (탭 타깃 44px+) ---------- */
+.radio-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.radio-row label {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 8px 16px;
+  border: 1.5px solid var(--line); border-radius: 999px;
+  font-size: .95rem; font-weight: 600; color: var(--muted);
+  cursor: pointer; background: #fff;
+}
+.radio-row label:has(input:checked) {
+  border-color: var(--brand); color: var(--brand-strong); background: var(--brand-soft);
+}
+.radio-row input[type="radio"] { width: 18px; height: 18px; accent-color: var(--brand); margin: 0; }
+
+/* ---------- article 표 가로 스크롤 (모바일) ---------- */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 14px -4px; padding: 0 4px; }
+.table-scroll table { min-width: 460px; }
+
+/* ---------- 예시 박스 ---------- */
+.example-box {
+  background: var(--brand-soft); border-radius: 12px;
+  padding: 16px 18px; margin: 16px 0; font-size: .95rem;
+}
+.example-box strong { color: var(--brand-strong); }
+
+/* ---------- 퀵버튼 칩 ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.chips button {
+  min-height: 40px; padding: 8px 14px;
+  border: 1.5px solid var(--line); border-radius: 999px; background: #fff;
+  font-size: .88rem; font-weight: 600; color: var(--muted); cursor: pointer;
+}
+.chips button.active { border-color: var(--brand); color: var(--brand-strong); background: var(--brand-soft); }

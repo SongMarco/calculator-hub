@@ -24,6 +24,18 @@ const faqs = [
     q: '전환율이 높으면 누구에게 유리한가요?',
     a: '보증금을 월세로 바꿀 때 전환율이 높으면 임차인의 월세 부담이 커집니다. 반대로 월세를 보증금으로 바꿀 때는 전환율이 높을수록 같은 월세로 더 적은 보증금을 내게 됩니다.',
   },
+  {
+    q: '집주인이 법정 상한보다 높은 전환율을 요구하면 어떻게 하나요?',
+    a: '계약 기간 중이나 갱신할 때 보증금을 월세로 바꾸는 경우라면 법 위반입니다. 전환율·기준금리·계산 근거를 문서(문자·계약서 특약)로 남기고, 분쟁 시 주택임대차분쟁조정위원회에 조정을 신청할 수 있습니다.',
+  },
+  {
+    q: '월세를 전세 보증금으로 바꾸자고 요구할 수도 있나요?',
+    a: '임차인이 일방적으로 요구할 권리는 없습니다. 월세→전세 전환은 집주인과의 합의 사항입니다. 다만 전환율을 기준으로 "월세 50만원이면 보증금 1.2억원이 적정하다"는 계산 근거를 들고 협상할 수 있습니다.',
+  },
+  {
+    q: '전세대출로 버티는 것과 월세로 돌리는 것 중 뭐가 유리한가요?',
+    a: '전세대출 금리와 비교해 보세요. 전세대출 금리가 전환율보다 높고 월세 세액공제(최대 17%)를 받을 수 있다면 월세 전환이 유리한 경우가 많습니다.',
+  },
 ];
 ---
 <BaseLayout
@@ -50,17 +62,17 @@ const faqs = [
     </div>
     <div class="field" id="f-amount">
       <label for="amount">줄이는 보증금 (만원)</label>
-      <input id="amount" type="number" value="10000" min="0" />
+      <input id="amount" type="number" inputmode="decimal" value="10000" min="0" />
       <div class="hint" id="amount-hint">월세로 돌리는 보증금 감액분</div>
     </div>
     <div class="field">
       <label for="rate">적용 전환율 (%/연)</label>
-      <input id="rate" type="number" value="5" min="0" step="0.1" />
+      <input id="rate" type="number" inputmode="decimal" value="5" min="0" step="0.1" />
       <div class="hint" id="rate-hint">법정 상한: 5.00% (기준금리 3.00% + 2%p)</div>
     </div>
     <div class="field">
       <label for="base">한국은행 기준금리 (%/연)</label>
-      <input id="base" type="number" value="3" min="0" step="0.05" />
+      <input id="base" type="number" inputmode="decimal" value="3" min="0" step="0.05" />
       <div class="hint">2026년 9월 기준 3.00%. 변동되므로 계약 시점 금리로 확인하세요</div>
     </div>
     <button class="btn" id="calc-btn">전환 금액 계산하기</button>
@@ -114,14 +126,15 @@ const faqs = [
 
   <section class="article">
     <h2>📖 전월세 전환율, 이렇게 계산합니다</h2>
-    <table>
+    <div class="example-box"><strong>💡 예시로 이해하기</strong><br>보증금 1억원을 월세로 돌리면 상한은 월 416,667원(1억원 × 5% ÷ 12)입니다. 반대로 월세 50만원을 보증금으로 바꾸면 1.2억원(50만원 × 12 ÷ 5%)이 적정선입니다.</div>
+    <div class="table-scroll"><table class="rate">
       <tr><th>방향</th><th>공식</th></tr>
       <tr><td>전세 → 월세</td><td>월세 = 보증금 감액분 × 전환율 ÷ 12</td></tr>
       <tr><td>월세 → 전세</td><td>보증금 증액분 = 월세 × 12 ÷ 전환율</td></tr>
-    </table>
+    </table></div>
     <h3>법정 상한 기준</h3>
     <ul>
-      <li>주택임대차보호법 시행령 제9조: <strong>연 10%</strong>와 <strong>기준금리 + 2%p</strong> 중 낮은 쪽</li>
+      <li>주택임대차보호법 시행령 제9조: <strong>연 10%</strong>와 <strong>기준금리 + 2%p(퍼센트포인트)</strong> 중 낮은 쪽</li>
       <li>기준금리 3.00% 기준 상한은 <strong>연 5.00%</strong> (보증금 1억원 → 월세 상한 약 41.7만원)</li>
       <li>적용 대상: 거주 중인 집의 계약 기간 중·갱신 시 보증금↔월세 전환</li>
       <li>신규 계약은 당사자 합의가 우선하므로 시장 전환율이 상한보다 높을 수 있습니다</li>

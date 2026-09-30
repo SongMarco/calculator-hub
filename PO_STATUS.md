@@ -118,3 +118,13 @@
 - 계산 예시 포함 (시급 10,320원×주 20시간×1년 6개월 → 약 1,859,296원, 세금 0원). FAQ 5개 (4주 평균·강행규정·포괄임금제 등 실제 질문). AI 카드 이미지 생성.
 - 연동: 허브 메인 카드, /salary/·/severance/ 관련 카드, docs/keywords.md #18 구현 표시, GovSupport는 severance 매핑 재사용.
 - 테스트 8개 추가 → 전체 107/107, 빌드 21페이지 (Vercel 루트·GH Pages /calculator-hub/ 둘 다 검증), sitemap 포함 확인.
+
+## 2026-09-30 10:50 KST — Wave 2 콘텐츠 보강 완료·푸시
+- 감사 에이전트 2명의 지적을 구현 에이전트 2명으로 반영 (17개 페이지):
+  - [필수] 팩트 오류 2건 수정: national-pension FAQ "보험료 9%" → "9.5% (2026년 인상, 2033년까지 13%)", dsr 전세대출 FAQ "포함" → "원칙 제외" (+ article 표 행도 일치시킴)
+  - [필수] freelancer thin content 보강 (FAQ 3개 + 예시), welfare FAQ 섹션 신설 (3개 + faqJsonLd 연결)
+  - FAQ 총 40+개 추가 (실제 검색 질문 기반: "이 계산기로 알 수 없는 것" 계열 포함), 예시 박스 16개 + salary 연봉별 실수령액 예시표
+  - first-home-tax: 농특세 별도 과세 반영 lib 수정 여파로 결과 표에 농특세 행 추가, 예시 박스 (3억원 → 총 150만원)
+- 예시 수치는 전부 계산기 lib 실측값으로 검증 후 반영 (감사 제안 중 salary 예시표·yearend-tax 수치가 실측과 달라 정정)
+- 모바일 UX: input 54개에 inputmode="decimal", .radio-row pill 스타일, article 표 table-scroll 래핑, salary 연봉 퀵버튼 (경쟁사 스윕 바로 적용 1순위)
+- 테스트 107/107, 빌드 21페이지 (Vercel 루트·GH Pages /calculator-hub/ 둘 다 검증), sitemap 포함

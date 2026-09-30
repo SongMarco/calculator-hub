@@ -28,6 +28,14 @@ const faqs = [
     q: '프리랜서도 이 계산기를 써도 되나요?',
     a: '아니요. 프리랜서·사업소득자는 4대보험이 아닌 3.3% 원천징수 방식이 적용됩니다. 프리랜서 3.3% 계산기를 이용하세요.',
   },
+  {
+    q: '국민연금 9.5%를 제가 다 내는 건가요?',
+    a: '아닙니다. 9.5%는 회사와 근로자가 절반씩 부담하는 전체 보험료율입니다. 월급에서 떼이는 건 본인 부담분 4.75%뿐이고, 나머지 4.75%는 회사가 냅니다. 건강보험(전체 7.19% 중 본인 3.595%)과 고용보험도 같은 방식으로 절반씩 나눠 냅니다.',
+  },
+  {
+    q: '연봉 5,000만원이면 월 실수령액은 얼마인가요?',
+    a: '2026년 기준, 월 비과세 20만원·부양가족 본인 1명 조건에서 월 약 354만원 수준입니다. 연봉 3,000만원은 약 223만원, 4,000만원은 약 291만원, 7,000만원은 약 480만원입니다. 조건에 따라 달라지니 위 계산기에 본인 조건을 넣어 확인해 보세요.',
+  },
 ];
 ---
 <BaseLayout
@@ -47,17 +55,24 @@ const faqs = [
     <h2>🧮 계산하기</h2>
     <div class="field">
       <label for="annual">세전 연봉 (만원)</label>
-      <input id="annual" type="number" value="5000" min="0" />
+      <div class="chips" id="salary-chips">
+        <button type="button" data-v="3000">3,000만원</button>
+        <button type="button" data-v="4000">4,000만원</button>
+        <button type="button" data-v="5000" class="active">5,000만원</button>
+        <button type="button" data-v="7000">7,000만원</button>
+        <button type="button" data-v="10000">1억원</button>
+      </div>
+      <input id="annual" type="number" inputmode="decimal" value="5000" min="0" />
       <div class="hint">상여금 포함 연간 총액 기준</div>
     </div>
     <div class="field">
       <label for="nontax">월 비과세액 (만원)</label>
-      <input id="nontax" type="number" value="20" min="0" />
+      <input id="nontax" type="number" inputmode="decimal" value="20" min="0" />
       <div class="hint">식대 등, 보통 월 20만원</div>
     </div>
     <div class="field">
       <label for="dependents">부양가족 수 (본인 포함)</label>
-      <input id="dependents" type="number" value="1" min="1" />
+      <input id="dependents" type="number" inputmode="decimal" value="1" min="1" />
     </div>
     <button class="btn" id="calc-btn">실수령액 계산하기</button>
 
@@ -84,7 +99,7 @@ const faqs = [
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
-    $('calc-btn').addEventListener('click', () => {
+    const runCalc = () => {
       const r = calcSalary({
         annualSalary: num('annual') * 10000,
         nonTaxableMonthly: num('nontax') * 10000,
@@ -98,20 +113,40 @@ const faqs = [
       $('r-employment').textContent = fmt(r.employment);
       $('r-tax').textContent = fmt(r.taxMonthly);
       $('result').classList.add('show');
+    };
+    $('calc-btn').addEventListener('click', runCalc);
+    // 연봉 퀵버튼: 클릭 즉시 입력값 세팅 + 자동 계산
+    $('salary-chips').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-v]');
+      if (!btn) return;
+      document.querySelectorAll('#salary-chips button').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      $('annual').value = btn.dataset.v;
+      runCalc();
     });
   </script>
 
   <section class="article">
     <h2>계산 방법</h2>
     <p>월 실수령액 = 세전 월급 − 4대보험 − (소득세 + 지방소득세). 2026년 기준 요율은 다음과 같습니다.</p>
-    <table class="rate">
+    <div class="table-scroll"><table class="rate">
       <tr><th>항목</th><th>근로자 부담률</th><th>비고</th></tr>
       <tr><td>국민연금</td><td>4.75%</td><td>기준소득월액 상한 659만원 (2026.7~)</td></tr>
       <tr><td>건강보험</td><td>3.595%</td><td>전체 7.19%의 절반</td></tr>
       <tr><td>장기요양보험</td><td>건강보험료의 13.14%</td><td></td></tr>
       <tr><td>고용보험</td><td>0.9%</td><td></td></tr>
-    </table>
+    </table></div>
     <p>소득세는 근로소득공제 → 인적공제(본인 포함 부양가족 1인당 150만원) 및 4대보험료 공제 → 과세표준에 기본세율(6~45%) 적용 → 근로소득세액공제 차감 순서로 추산하고, 12개월로 나눕니다. 지방소득세는 소득세의 10%입니다.</p>
+    <h2>연봉별 실수령액 예시</h2>
+    <p>월 비과세 20만원, 부양가족 본인 1명 기준 추정치입니다.</p>
+    <div class="table-scroll"><table class="rate">
+      <tr><th>연봉</th><th>월 실수령액 (추정)</th></tr>
+      <tr><td>3,000만원</td><td>약 223만원</td></tr>
+      <tr><td>4,000만원</td><td>약 291만원</td></tr>
+      <tr><td>5,000만원</td><td>약 354만원</td></tr>
+      <tr><td>7,000만원</td><td>약 480만원</td></tr>
+      <tr><td>1억원</td><td>약 656만원</td></tr>
+    </table></div>
     <h2>꼭 알아두세요</h2>
     <ul>
       <li>4대보험은 식대 등 비과세액을 제외한 보수월액에 부과됩니다.</li>

@@ -22,7 +22,15 @@ const faqs = [
   },
   {
     q: '전세자금대출도 DSR에 포함되나요?',
-    a: '네. 전세자금대출의 이자 상환액도 DSR 계산에 포함됩니다. 다만 이자만 내는 구조라 원리금 대출보다 부담은 작습니다.',
+    a: '원칙적으로 전세대출은 DSR 계산에서 제외됩니다. 다만 수도권·규제지역에서 1주택자가 받는 전세대출 등은 이자 상환액이 반영될 수 있어 은행마다 확인이 필요합니다.',
+  },
+  {
+    q: '마이너스통장(한도대출)은 DSR에 어떻게 반영되나요?',
+    a: '실제로 쓴 금액이 아니라 약정한 한도 전체를 기준으로 DSR에 반영됩니다. 한도 5,000만원 중 1,000만원만 썼어도 5,000만원 기준으로 계산되니, 안 쓰는 마이너스통장은 정리하는 게 DSR에 유리합니다.',
+  },
+  {
+    q: '맞벌이인데 배우자 소득도 합산되나요?',
+    a: 'DSR의 연소득은 원칙적으로 대출받는 사람(차주) 본인의 소득입니다. 배우자 소득 합산 인정 여부는 대출 상품과 은행마다 다르니, 합산이 필요하다면 상담 시 반드시 확인하세요.',
   },
   {
     q: '신용대출은 어떻게 계산되나요?',
@@ -40,31 +48,31 @@ const faqs = [
 >
   <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; DSR 계산기</p>
   <h1 class="page-title">DSR · 스트레스 DSR 계산기</h1>
-  <p class="page-desc">연소득과 대출 조건을 입력하면 DSR과 스트레스 DSR을 계산해 드립니다.</p>
+  <p class="page-desc">연소득과 대출 조건을 입력하면 DSR(연소득 대비 1년에 갚는 돈의 비율)과 스트레스 DSR을 계산해 대출 한도를 가늠해 드립니다.</p>
   <p class="updated">2026년 스트레스 금리 기준 적용 · 최종 업데이트 2026-09-28</p>
 
   <section class="calc">
     <h2>🧮 계산하기</h2>
     <div class="field">
       <label for="income">연소득 (만원, 세전)</label>
-      <input id="income" type="number" value="6000" min="0" />
+      <input id="income" type="number" inputmode="decimal" value="6000" min="0" />
     </div>
     <div class="field">
       <label for="existing">기존 대출 연간 원리금 합계 (만원)</label>
-      <input id="existing" type="number" value="0" min="0" />
+      <input id="existing" type="number" inputmode="decimal" value="0" min="0" />
       <div class="hint">없으면 0. 신용대출은 만기 5년 분할상환 기준으로 환산</div>
     </div>
     <div class="field">
       <label for="amount">신규 대출금액 (만원)</label>
-      <input id="amount" type="number" value="30000" min="0" />
+      <input id="amount" type="number" inputmode="decimal" value="30000" min="0" />
     </div>
     <div class="field">
       <label for="rate">연 금리 (%)</label>
-      <input id="rate" type="number" value="4" min="0" step="0.1" />
+      <input id="rate" type="number" inputmode="decimal" value="4" min="0" step="0.1" />
     </div>
     <div class="field">
       <label for="years">만기 (년)</label>
-      <input id="years" type="number" value="30" min="1" />
+      <input id="years" type="number" inputmode="decimal" value="30" min="1" />
     </div>
     <div class="field">
       <label for="region">지역</label>
@@ -131,13 +139,14 @@ const faqs = [
     <p><strong>DSR(총부채원리금상환비율)</strong> = 모든 대출의 연간 원리금 상환액 ÷ 연소득 × 100. 갚을 능력을 초과하는 대출을 막기 위한 규제입니다. 은행권은 총대출 1억원 초과 차주에게 <strong>40%</strong> 한도를 적용합니다.</p>
     <h2>스트레스 DSR</h2>
     <p>한도 산정 시 실제 금리에 스트레스 금리를 더해 계산합니다. 2026년 하반기 기준 <strong>수도권·규제지역 주택담보대출에 3.0%p</strong>가 가산됩니다(3단계 100% 반영). 고정금리(5년 이상)는 가산이 완화·면제될 수 있습니다.</p>
-    <table class="rate">
+    <div class="table-scroll"><table class="rate">
       <tr><th>대출 종류</th><th>DSR 반영 방식</th></tr>
       <tr><td>주택담보대출</td><td>실제 만기 기준 원리금</td></tr>
       <tr><td>신용대출</td><td>만기 5년 분할상환으로 환산</td></tr>
-      <tr><td>전세자금대출</td><td>이자 상환액 반영</td></tr>
+      <tr><td>전세자금대출</td><td>원칙 제외 (수도권·규제지역 1주택자 등은 이자분 반영 가능)</td></tr>
       <tr><td>카드론·현금서비스</td><td>잔액 기준 반영</td></tr>
-    </table>
+    </table></div>
+    <div class="example-box"><strong>💡 예시로 이해하기</strong><br>연봉 5,000만원인 차주가 금리 연 4%·30년 만기 변동금리로 주담대를 받는다면, 스트레스 DSR(3.0%p 가산) 적용 전 한도는 약 2억 9,400만원이지만 적용 후에는 약 2억 5,100만원으로 약 4,300만원 줄어듭니다. (금리·은행별 심사 기준에 따라 달라질 수 있는 추정치입니다)</div>
   </section>
 
   <Faq items={faqs} />

@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
+import Faq from '../../components/Faq.astro';
 import { PROGRAMS, MEDIAN_INCOME_2026 } from '../../data/welfare.js';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 // 연봉 구간 피라미드 (2024년 귀속 국세청 연말정산 통계 기반 대략적 근로소득 분포)
 // share: 해당 구간 인구 비중(%), upper: null = 상한 없음
@@ -22,6 +24,21 @@ function criterionText(p) {
   if (t === 'median') return `기준 중위소득 ${p.income.percent}% 이하`;
   return `연봉 ${p.income.amount.toLocaleString('ko-KR')}만원 이하`;
 }
+
+const faqs = [
+  {
+    q: '"기준 중위소득 60% 이하"가 내 월급으로 얼마인가요?',
+    a: '가구원 수의 중위소득 금액에 %를 곱하면 됩니다. 2026년 기준 4인 가구 중위소득은 월 약 649만원이므로 60% 이하는 월 약 390만원 이하입니다. 1인 가구는 월 약 256만원의 60%인 약 154만원 이하가 기준입니다. 위 표에서 가구원 수별 금액을 먼저 확인해 보세요.',
+  },
+  {
+    q: '소득인정액이 뭔가요? 월급이랑 다른 건가요?',
+    a: '다릅니다. 소득인정액은 월 소득에 재산(집·차·예금 등)을 소득으로 환산한 금액을 더한 것으로, 실제 심사 기준입니다. 그래서 월급이 기준보다 조금 높아도 재산이 적으면 대상이 될 수 있고, 반대로 월급이 낮아도 재산이 많으면 탈락할 수 있습니다.',
+  },
+  {
+    q: '정부 지원금은 조건이 되면 자동으로 주나요?',
+    a: '아닙니다. 대부분의 복지 제도는 신청주의라 직접 신청해야 받을 수 있습니다. 나라에서 알아서 챙겨주지 않으니, 이 페이지에서 해당될 만한 제도를 찾았다면 복지로(bokjiro.go.kr)나 주소지 행정복지센터에서 바로 신청하세요.',
+  },
+];
 ---
 <BaseLayout
   title="내 연봉으로 찾는 정부 지원금 (2026)"
@@ -29,6 +46,7 @@ function criterionText(p) {
   keywords="정부 지원금 찾기, 내 연봉 지원금, 2026 복지 혜택, 청년월세 지원 조건, 근로장려금 조건"
   path="/welfare/"
   ogImage="/images/og-welfare.webp"
+  jsonLd={faqJsonLd(faqs, pageUrl("/welfare/"))}
 >
   <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; 정부 지원금 찾기</p>
   <section class="banner">
@@ -142,11 +160,12 @@ function criterionText(p) {
 
   <section class="article">
     <h2>2026년 기준 중위소득표 (월)</h2>
-    <table class="rate">
+    <div class="table-scroll"><table class="rate">
       <tr><th>가구원 수</th><th>1인</th><th>2인</th><th>3인</th><th>4인</th></tr>
       <tr><td>중위소득 100%</td><td>256만원</td><td>420만원</td><td>536만원</td><td>649만원</td></tr>
-    </table>
+    </table></div>
     <p>보건복지부 고시 기준이며, 원 단위 정확한 금액은 복지로에서 확인할 수 있습니다. 중위소득 기준 제도는 월 소득인정액(근로소득 공제·재산 환산을 반영한 금액)으로 심사하므로, 월급이 기준보다 조금 높아도 해당될 수 있습니다.</p>
+    <div class="example-box"><strong>💡 예시로 이해하기</strong><br>"기준 중위소득 60% 이하" 제도를 4인 가구가 신청한다면, 2026년 4인 가구 중위소득 월 649만원 × 60% = 월 약 390만원 이하가 기준입니다. 같은 제도라도 1인 가구면 월 약 256만원 × 60% = 약 154만원 이하가 됩니다.</div>
     <h2>판정 기준 안내</h2>
     <ul>
       <li><strong>받을 수 있어요</strong>: 제도 소득 상한이 선택한 구간의 상한보다 높거나 같아, 구간 내 어떤 연봉에서도 기준을 만족합니다.</li>
@@ -163,6 +182,8 @@ function criterionText(p) {
   </section>
 
   <AdSlot slotId={AD_SLOTS.IN_CONTENT} />
+
+  <Faq items={faqs} />
 
   <script define:vars={{ median: MEDIAN_INCOME_2026, brackets: BRACKETS }}>
     let household = 1;

@@ -28,6 +28,18 @@ const faqs = [
     q: '언제까지 받을 수 있나요?',
     a: '사용자는 퇴직일로부터 14일 이내에 퇴직금을 지급해야 합니다. 당사자 합의로 연장할 수 있으며, 지연 시 연 20%의 지연이자가 붙습니다.',
   },
+  {
+    q: '평균임금이 통상임금보다 적게 나오면 어떻게 되나요?',
+    a: '퇴직금은 평균임금과 통상임금 중 더 큰 금액으로 계산합니다. 평균임금이 통상임금보다 적다면 통상임금 기준으로 계산됩니다.',
+  },
+  {
+    q: '퇴직금을 못 받았는데 어떻게 해야 하나요?',
+    a: '퇴직일로부터 14일이 지나도 지급되지 않으면 임금체불입니다. 고용노동부 고객상담센터(☎1350)나 관할 지방고용노동관서에 진정을 넣을 수 있고, 지연 기간에 연 20%의 지연이자를 청구할 수 있습니다. 퇴직금 청구권의 소멸시효는 3년이니 미루지 마세요.',
+  },
+  {
+    q: '2026년부터 퇴직금은 IRP 계좌로 받아야 하나요?',
+    a: '원칙적으로 퇴직금은 IRP(개인형 퇴직연금) 계좌로 먼저 이체된 뒤 본인이 인출하는 방식입니다. IRP로 받으면 세금을 당장 내지 않고(과세이연) 55세 이후 연금으로 받을 때 세금도 30~50% 감면됩니다. 55세 이상이거나 300만원 이하 등 예외에서는 바로 일반 계좌로 받을 수 있습니다.',
+  },
 ];
 ---
 <BaseLayout
@@ -47,29 +59,29 @@ const faqs = [
     <h2>🧮 계산하기</h2>
     <div class="field">
       <label for="wages">퇴직 전 3개월 임금총액 (만원)</label>
-      <input id="wages" type="number" value="900" min="0" />
+      <input id="wages" type="number" inputmode="decimal" value="900" min="0" />
       <div class="hint">세전, 상여금 제외</div>
     </div>
     <div class="field">
       <label for="days">3개월 총일수 (일)</label>
-      <input id="days" type="number" value="92" min="1" />
+      <input id="days" type="number" inputmode="decimal" value="92" min="1" />
       <div class="hint">달력일수 (예: 1~3월은 90~92일)</div>
     </div>
     <div class="field">
       <label for="bonus">연간 상여금 총액 (만원)</label>
-      <input id="bonus" type="number" value="0" min="0" />
+      <input id="bonus" type="number" inputmode="decimal" value="0" min="0" />
     </div>
     <div class="field">
       <label for="leave">미사용 연차수당 (만원)</label>
-      <input id="leave" type="number" value="0" min="0" />
+      <input id="leave" type="number" inputmode="decimal" value="0" min="0" />
     </div>
     <div class="field">
       <label for="years">재직기간 (년)</label>
-      <input id="years" type="number" value="3" min="0" />
+      <input id="years" type="number" inputmode="decimal" value="3" min="0" />
     </div>
     <div class="field">
       <label for="months">재직기간 (개월, 년 제외)</label>
-      <input id="months" type="number" value="0" min="0" max="11" />
+      <input id="months" type="number" inputmode="decimal" value="0" min="0" max="11" />
     </div>
     <button class="btn" id="calc-btn">퇴직금 계산하기</button>
 
@@ -115,19 +127,20 @@ const faqs = [
     <p><strong>1일 평균임금</strong> = (퇴직 전 3개월 임금총액 + 연간상여금×3/12 + 연차수당×3/12) ÷ 3개월 총일수</p>
     <p><strong>퇴직금(세전)</strong> = 1일 평균임금 × 30일 × (재직일수 ÷ 365)</p>
     <p>퇴직소득세는 <strong>연평균과세</strong>로 계산됩니다. 근속연수공제(5년 이하 연 100만원 등)를 뺀 뒤 환산급여(= 과세대상 ÷ 근속연수 × 12)에 환산급여공제를 적용하고, 기본세율로 산출한 세액을 다시 12로 나눠 근속연수를 곱합니다. 지방소득세 10%가 추가됩니다.</p>
-    <table class="rate">
+    <div class="table-scroll"><table class="rate">
       <tr><th>근속연수</th><th>근속연수공제</th></tr>
       <tr><td>5년 이하</td><td>100만원 × 근속연수</td></tr>
       <tr><td>5년 초과 10년 이하</td><td>500만원 + 200만원 × (근속연수 − 5)</td></tr>
       <tr><td>10년 초과 20년 이하</td><td>1,500만원 + 300만원 × (근속연수 − 10)</td></tr>
       <tr><td>20년 초과</td><td>4,500만원 + 500만원 × (근속연수 − 20)</td></tr>
-    </table>
+    </table></div>
     <h2>꼭 알아두세요</h2>
     <ul>
       <li>퇴직금은 퇴직일로부터 <strong>14일 이내</strong>에 지급되어야 합니다.</li>
       <li>퇴직연금(DB·DC형) 가입자는 회사가 적립한 퇴직연금으로 갈음할 수 있습니다.</li>
       <li>퇴직소득은 종합소득 합산이 아닌 <strong>분류과세</strong>라 연말정산과 별개입니다.</li>
     </ul>
+    <div class="example-box"><strong>💡 예시로 이해하기</strong><br>월급 300만원(세전)으로 3년 근무하고 퇴직한다면, 세전 퇴직금은 약 880만원입니다. 근속연수공제(연 100만원 × 3년) 덕분에 퇴직소득세는 약 10만원 수준이라 실수령액은 약 871만원이 됩니다.</div>
   </section>
 
   <AdSlot slotId={AD_SLOTS.IN_CONTENT} />
