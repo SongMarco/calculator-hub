@@ -1,0 +1,206 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { u } from '../../lib/paths.js';
+import Faq from '../../components/Faq.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
+
+const faqs = [
+  {
+    q: '물타기(평균단가 낮추기)가 뭔가요?',
+    a: '주가가 내가 산 가격(평단가)보다 떨어졌을 때, 더 싼 가격에 주식을 추가로 사서 전체 평균 매입단가를 낮추는 전략입니다. 평단가가 낮아지면 주가가 조금만 반등해도 손실 구간을 벗어날 수 있습니다. 새 평단가 = (보유수량 × 평단가 + 추가수량 × 추가단가) ÷ (보유수량 + 추가수량)으로 계산합니다.',
+  },
+  {
+    q: '물타기와 불타기는 뭐가 다른가요?',
+    a: '물타기는 떨어진 가격에 추가로 사서 평단가를 낮추는 것이고, 불타기는 오른 가격에 추가로 사서 평단가를 올리면서 추세를 타는 것입니다. 방향이 정반대입니다. 떨어지는 종목에 불타기를 하면 평단가만 올라가 손실이 커지므로, 지금 입력한 추가 매수 단가가 평단가보다 낮은지 먼저 확인하세요.',
+  },
+  {
+    q: '목표 평단가를 맞추려면 몇 주를 사야 하나요?',
+    a: '위 계산기의 "목표 평단가 역계산" 탭을 사용하세요. 현재 보유 수량·평단가·현재가·목표 평단가를 입력하면 현재가 기준으로 추가 매수해야 할 수량과 금액을 역산해 줍니다. 단, 목표 평단가가 현재가보다 낮거나 같으면 아무리 사도 도달할 수 없습니다.',
+  },
+  {
+    q: '"떨어지는 칼날을 잡지 말라"는 말은 무슨 뜻인가요?',
+    a: '실적이 악화되거나 사업 자체가 흔들리는 기업의 주식을 "싸졌다"는 이유만으로 물타기하면, 주가가 계속 떨어지며 추가 매수금이 함께 물리는 상황을 뜻합니다. 물타기는 기업의 펀더멘털이 괜찮고 일시적 하락이라고 판단될 때, 손절 라인을 미리 정해두고 제한적으로 쓰는 것이 원칙입니다.',
+  },
+  {
+    q: '손절 라인과 물타기를 같이 쓰는 방법은?',
+    a: '추가 매수 전에 "이 가격까지 떨어지면 전량 손절" 라인을 먼저 정하세요. 예를 들어 현재가의 10~20% 아래를 손절선으로 두고, 그 안에서 1~2회로 추가 매수 횟수를 제한합니다. 무계획으로 계속 물타기를 반복하면 투자금이 한 종목에 과도하게 집중됩니다.',
+  },
+];
+---
+<BaseLayout
+  title="주식 물타기 계산기 (평단가 낮추기)"
+  description="주식 물타기 후 평단가·총 투자금·인하율을 계산하세요. 목표 평단가에 필요한 추가 매수 수량 역계산도 지원합니다."
+  keywords="물타기 계산기, 주식 평단가 계산기, 평균단가 낮추기, 주식 추가매수 계산"
+  path="/avg-down/"
+  jsonLd={faqJsonLd(faqs, pageUrl("/avg-down/"))}
+>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; 물타기 계산기</p>
+  <h1 class="page-title">주식 물타기 계산기</h1>
+  <p class="page-desc">떨어진 주식에 추가로 매수하면 평단가가 얼마나 낮아지는지 계산해 드립니다. 목표 평단가 역계산도 지원합니다.</p>
+  <p class="updated">2026-09-30 기준 · 최종 업데이트 2026-09-30</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="mode-toggle">
+      <button class="active" data-mode="basic">기본 계산</button>
+      <button data-mode="reverse">목표 평단가 역계산</button>
+    </div>
+
+    <div id="mode-basic">
+      <div class="field">
+        <label for="qty">현재 보유 수량 (주)</label>
+        <input id="qty" type="number" inputmode="decimal" value="100" min="0" />
+      </div>
+      <div class="field">
+        <label for="avg">현재 평단가 (원)</label>
+        <input id="avg" type="number" inputmode="decimal" value="50000" min="0" />
+      </div>
+      <div class="field">
+        <label for="add-price">추가 매수 단가 (원)</label>
+        <input id="add-price" type="number" inputmode="decimal" value="30000" min="0" />
+        <div class="hint">지금 추가로 살 가격 (현재가)</div>
+      </div>
+      <div class="field">
+        <label for="add-qty">추가 매수 수량 (주)</label>
+        <input id="add-qty" type="number" inputmode="decimal" value="100" min="0" />
+      </div>
+      <button class="btn" id="calc-btn">물타기 결과 계산하기</button>
+
+      <div class="result" id="result">
+        <div id="r-label">물타기 후 평단가</div>
+        <div class="big" id="r-avg">-</div>
+        <table>
+          <tr><th>항목</th><th>금액</th></tr>
+          <tr><td>총 보유 수량</td><td id="r-qty">-</td></tr>
+          <tr><td>총 투자금액</td><td id="r-cost">-</td></tr>
+          <tr><td>평단가 인하액</td><td id="r-reduce">-</td></tr>
+          <tr><td>평단가 인하율</td><td id="r-rate">-</td></tr>
+        </table>
+        <p class="note">수수료·세금은 제외한 참고용 계산입니다. 투자 참고용이며 투자 권유가 아닙니다.</p>
+      </div>
+    </div>
+
+    <div id="mode-reverse" style="display:none">
+      <div class="field">
+        <label for="rv-qty">현재 보유 수량 (주)</label>
+        <input id="rv-qty" type="number" inputmode="decimal" value="100" min="0" />
+      </div>
+      <div class="field">
+        <label for="rv-avg">현재 평단가 (원)</label>
+        <input id="rv-avg" type="number" inputmode="decimal" value="50000" min="0" />
+      </div>
+      <div class="field">
+        <label for="rv-price">현재가 (추가 매수 단가, 원)</label>
+        <input id="rv-price" type="number" inputmode="decimal" value="30000" min="0" />
+      </div>
+      <div class="field">
+        <label for="rv-target">목표 평단가 (원)</label>
+        <input id="rv-target" type="number" inputmode="decimal" value="40000" min="0" />
+        <div class="hint">현재가보다 높아야 도달 가능합니다</div>
+      </div>
+      <button class="btn" id="calc-rv-btn">필요 매수량 역계산하기</button>
+
+      <div class="result" id="rv-result">
+        <div id="rv-label">추가 매수 필요 수량</div>
+        <div class="big" id="rv-qty-out">-</div>
+        <table>
+          <tr><th>항목</th><th>금액</th></tr>
+          <tr><td>필요 매수금액</td><td id="rv-cost">-</td></tr>
+          <tr><td>매수 후 총 보유 수량</td><td id="rv-total-qty">-</td></tr>
+          <tr><td>매수 후 총 투자금액</td><td id="rv-total-cost">-</td></tr>
+        </table>
+        <p class="note" id="rv-note">수수료·세금은 제외한 참고용 계산입니다. 투자 참고용이며 투자 권유가 아닙니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
+
+  <script>
+    import { calcAvgDown, calcReverseAvgDown } from '../../lib/avg-down.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const fmtQty = (n) => (Math.round(n * 100) / 100).toLocaleString('ko-KR') + '주';
+    const num = (id) => { const v = $(id).value.replace(/,/g, ''); return parseFloat(v) || 0; };
+
+    document.querySelectorAll('.mode-toggle button').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.mode-toggle button').forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        const isBasic = tab.dataset.mode === 'basic';
+        $('mode-basic').style.display = isBasic ? '' : 'none';
+        $('mode-reverse').style.display = isBasic ? 'none' : '';
+      });
+    });
+
+    $('calc-btn').addEventListener('click', () => {
+      const r = calcAvgDown({ qty: num('qty'), avgPrice: num('avg'), addQty: num('add-qty'), addPrice: num('add-price') });
+      if (!r) {
+        $('r-avg').textContent = '입력을 확인해 주세요';
+        $('result').classList.add('show');
+        return;
+      }
+      $('r-avg').textContent = fmt(r.avg);
+      $('r-qty').textContent = fmtQty(r.qty);
+      $('r-cost').textContent = fmt(r.totalCost);
+      const up = r.reduceAmount < 0;
+      if (up) {
+        $('r-reduce').textContent = '+' + fmt(r.avg - num('avg')) + ' (평단가 상승)';
+        $('r-rate').textContent = '+' + (-r.reduceRate).toFixed(2) + '%';
+      } else {
+        $('r-reduce').textContent = fmt(r.reduceAmount);
+        $('r-rate').textContent = r.reduceRate.toFixed(2) + '%';
+      }
+      $('result').classList.add('show');
+    });
+
+    $('calc-rv-btn').addEventListener('click', () => {
+      const qty = num('rv-qty'), avgPrice = num('rv-avg'), buyPrice = num('rv-price'), targetAvg = num('rv-target');
+      const r = calcReverseAvgDown({ qty, avgPrice, buyPrice, targetAvg });
+      if (!r.ok) {
+        const msg = { invalid: '입력을 확인해 주세요', already: '이미 목표 평단가 이하입니다', impossible: '현재가로는 목표에 도달할 수 없습니다' }[r.reason];
+        $('rv-qty-out').textContent = msg;
+        $('rv-cost').textContent = '-';
+        $('rv-total-qty').textContent = '-';
+        $('rv-total-cost').textContent = '-';
+        $('rv-result').classList.add('show');
+        return;
+      }
+      $('rv-qty-out').textContent = fmtQty(r.addQty);
+      $('rv-cost').textContent = fmt(r.addCost);
+      $('rv-total-qty').textContent = fmtQty(qty + r.addQty);
+      $('rv-total-cost').textContent = fmt(qty * avgPrice + r.addCost);
+      $('rv-result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>물타기(평단가 낮추기)란?</h2>
+    <div class="example-box"><strong>💡 예시로 이해하기</strong><br>50,000원에 100주를 샀다가 주가가 30,000원으로 떨어졌습니다. 30,000원에 100주를 추가로 사면 평단가는 (100×50,000 + 100×30,000) ÷ 200 = <strong>40,000원</strong>이 됩니다. 평단가 인하액 10,000원, 인하율 20%입니다.</div>
+    <div class="example-box"><strong>💡 역계산 예시</strong><br>위 상황에서 평단가를 40,000원까지 낮추고 싶다면, 현재가 30,000원 기준으로 100주를 추가로 사야 합니다 (추가 투자금 3,000,000원). "목표 평단가 역계산" 탭에서 바로 계산할 수 있습니다.</div>
+    <p>물타기는 주가가 평단가 아래로 떨어졌을 때 추가로 매수해 <strong>평균 매입단가를 낮추는 전략</strong>입니다. 평단가가 낮아지면 주가가 조금만 올라도 손실 구간을 벗어날 수 있습니다. 반대로, 오른 가격에 추가로 사는 것은 <strong>불타기</strong>라고 하며 평단가가 올라갑니다.</p>
+    <div class="table-scroll"><table class="rate">
+      <tr><th>구분</th><th>추가 매수 단가</th><th>평단가 변화</th></tr>
+      <tr><td>물타기</td><td>평단가보다 낮게 매수</td><td>하락</td></tr>
+      <tr><td>불타기</td><td>평단가보다 높게 매수</td><td>상승</td></tr>
+    </table></div>
+    <h2>물타기 전 체크리스트</h2>
+    <ul>
+      <li><strong>손절 라인을 먼저 정하세요.</strong> 추가 매수 전에 "이 가격 아래로 떨어지면 전량 매도" 기준을 정해두면 무계획 물타기를 막을 수 있습니다.</li>
+      <li><strong>횟수를 제한하세요.</strong> 1~2회로 끊지 않으면 한 종목에 투자금이 과도하게 집중됩니다.</li>
+      <li><strong>떨어지는 칼날을 조심하세요.</strong> 실적 악화·사업 리스크로 떨어지는 종목을 "싸다"는 이유만으로 물타기하면 손실이 커집니다. 기업의 펀더멘털을 먼저 점검하세요.</li>
+      <li>수수료·세금은 이 계산에 포함되지 않습니다. 실제 매매 시 증권사 수수료와 양도소득세(해당 시)를 별도로 고려하세요.</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+
+  <section class="related">
+    <h2>관련 계산기</h2>
+    <div class="grid">
+      <a class="card" href={u("/irp/")}><h3>IRP 세금 비교 계산기</h3><p>투자금 인출 시 세금 비교</p></a>
+    </div>
+  </section>
+</BaseLayout>
