@@ -86,7 +86,7 @@ export const PROGRAMS = [
     url: 'https://www.hometax.go.kr',
     urlLabel: '홈택스에서 신청·모의계산하기',
     income: { type: 'salaryCap', amount: 2200, note: '단독가구 기준. 홑벌이가구는 3,200만원, 맞벌이가구는 4,400만원까지 가능' },
-    pages: ['salary', 'hourly-wage'],
+    pages: ['salary', 'hourly-wage', 'refund33'],
   },
   {
     id: 'pension-tax-credit',
@@ -122,7 +122,7 @@ export const PROGRAMS = [
     url: 'https://nhuf.molit.go.kr',
     urlLabel: '주택도시기금에서 확인하기',
     income: { type: 'salaryCap', amount: 6000, note: '부부합산 연소득 기준. 생애최초·신혼부부는 7,000만~8,500만원까지 가능' },
-    pages: ['dsr'],
+    pages: ['dsr', 'first-home-tax'],
   },
   {
     id: 'beotimmok',
@@ -134,7 +134,7 @@ export const PROGRAMS = [
     url: 'https://nhuf.molit.go.kr',
     urlLabel: '주택도시기금에서 확인하기',
     income: { type: 'salaryCap', amount: 5000, note: '부부합산 연소득 기준. 신혼부부는 7,500만원까지, 청년전용은 별도 기준 적용' },
-    pages: ['dsr'],
+    pages: ['dsr', 'first-home-tax'],
   },
   {
     id: 'durunuri',
@@ -146,7 +146,7 @@ export const PROGRAMS = [
     url: 'https://www.bokjiro.go.kr',
     urlLabel: '복지로에서 제도 확인하기',
     income: { type: 'salaryCap', amount: 3240, note: '월평균보수 270만원 미만 기준을 연봉으로 환산. 10인 미만 사업장 신규 가입자 조건도 함께 충족해야 함' },
-    pages: ['freelancer'],
+    pages: ['freelancer', 'expense-ratio'],
   },
 ];
 
