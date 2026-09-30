@@ -1,0 +1,121 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { u } from '../../lib/paths.js';
+import Faq from '../../components/Faq.astro';
+import GovSupport from '../../components/GovSupport.astro';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
+
+const faqs = [
+  {
+    q: '연말정산 미리보기와 실제 정산이 다를 수 있나요?',
+    a: '네. 이 계산기는 근로소득공제·인적공제·근로소득세액공제·연금계좌세액공제만 반영한 간이 계산입니다. 신용카드·의료비·교육비·기부금·보험료 등 다른 공제를 넣으면 환급액이 달라집니다. 홈택스 연말정산 미리보기에서 공제 항목을 넣어 최종 확인하세요.',
+  },
+  {
+    q: '기납부세액은 어디서 확인하나요?',
+    a: '매월 급여명세서의 원천징수세액(소득세+지방소득세 중 소득세 부분)을 합산하면 됩니다. 지방소득세는 제외하고 입력하세요.',
+  },
+  {
+    q: '연금계좌 세액공제는 얼마나 되나요?',
+    a: '연금저축+IRP 합산 연간 900만원 한도로, 총급여 5,500만원 이하는 15%, 초과는 12%를 세액공제합니다. 이 계산기는 입력한 납입액에 해당 공제율을 적용합니다.',
+  },
+  {
+    q: '환급금은 언제 받나요?',
+    a: '회사가 2월 급여에 정산액을 반영해 지급하는 것이 일반적입니다. 추가 납부세액이 나오면 같은 시기 급여에서 차감됩니다.',
+  },
+];
+---
+<BaseLayout
+  title="연말정산 미리보기 계산기"
+  description="2026년 연말정산 환급 예상액을 미리 계산하세요. 근로소득공제·인적공제·세액공제 반영 간이 미리보기."
+  keywords="연말정산 미리보기, 연말정산 환급금 계산기, 연말정산 계산기, 2026 연말정산"
+  path="/yearend-tax/"
+  ogImage="/images/card-yearend-tax.webp"
+  jsonLd={faqJsonLd(faqs, pageUrl("/yearend-tax/"))}
+>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; 연말정산 미리보기 계산기</p>
+  <h1 class="page-title">연말정산 미리보기 계산기</h1>
+  <p class="page-desc">총급여와 공제 항목을 입력하면 2026년 기준 환급 예상액(또는 추가 납부액)을 계산해 드립니다.</p>
+  <p class="updated">2026년 세율·공제 기준 · 최종 업데이트 2026-09-30</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label for="pay">연간 총급여 (만원, 세전)</label>
+      <input id="pay" type="number" value="5000" min="0" />
+      <div class="hint">비과세 제외, 1년간 총 급여</div>
+    </div>
+    <div class="field">
+      <label for="dep">인적공제 인원 (본인 포함)</label>
+      <input id="dep" type="number" value="1" min="1" />
+      <div class="hint">1인당 150만원 공제</div>
+    </div>
+    <div class="field">
+      <label for="pension">연금계좌 연간 납입액 (만원)</label>
+      <input id="pension" type="number" value="0" min="0" />
+      <div class="hint">연금저축+IRP 합산, 연 900만원 한도</div>
+    </div>
+    <div class="field">
+      <label for="prepaid">기납부세액 (만원, 소득세분)</label>
+      <input id="prepaid" type="number" value="300" min="0" />
+      <div class="hint">매월 원천징수된 소득세 합계 (지방소득세 제외)</div>
+    </div>
+    <button class="btn" id="calc-btn">환급액 계산하기</button>
+
+    <div class="result" id="result">
+      <div id="r-label">예상 환급액</div>
+      <div class="big" id="r-balance">-</div>
+      <table>
+        <tr><th>항목</th><th>금액</th></tr>
+        <tbody id="r-rows"></tbody>
+      </table>
+      <p class="note">신용카드·의료비·교육비·기부금 등 다른 공제는 미반영된 간이 계산입니다. 홈택스 미리보기로 최종 확인하세요.</p>
+    </div>
+  </section>
+
+  <script>
+    import { calcYearEndTax } from '../../lib/yearend-tax.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    $('calc-btn').addEventListener('click', () => {
+      const r = calcYearEndTax({
+        totalPay: num('pay') * 10000,
+        dependents: Math.floor(num('dep')),
+        pensionContribution: num('pension') * 10000,
+        prepaid: num('prepaid') * 10000,
+      });
+      $('r-label').textContent = r.isRefund ? '예상 환급액' : '예상 추가 납부액';
+      $('r-balance').textContent = fmt(Math.abs(r.balance));
+      $('r-rows').innerHTML = [
+        ['근로소득공제', r.incomeDeduction],
+        ['인적공제', r.personalDeduction],
+        ['과세표준', r.taxBase],
+        ['산출세액', r.computedTax],
+        ['근로소득세액공제', r.creditEarned],
+        ['연금계좌세액공제', r.creditPension],
+        ['결정세액', r.finalTax],
+      ].map(([k, v]) => `<tr><td>${k}</td><td>${fmt(v)}</td></tr>`).join('');
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>📖 연말정산, 이렇게 계산됩니다</h2>
+    <ol>
+      <li><strong>근로소득금액</strong> = 총급여 − 근로소득공제 (총급여 구간별 70%~2%, 한도 2,000만원)</li>
+      <li><strong>과세표준</strong> = 근로소득금액 − 인적공제 (1인당 150만원)</li>
+      <li><strong>산출세액</strong> = 과세표준 × 기본세율 (6%~45%)</li>
+      <li><strong>결정세액</strong> = 산출세액 − 근로소득세액공제 − 연금계좌세액공제</li>
+      <li><strong>차감징수세액</strong> = 결정세액 − 기납부세액 → 음수면 환급, 양수면 추가 납부</li>
+    </ol>
+    <h3>꼭 알아두세요</h3>
+    <ul>
+      <li>이 계산기에 없는 신용카드·의료비·교육비 공제를 넣으면 환급액이 늘어날 수 있습니다.</li>
+      <li>연금계좌는 총급여 5,500만원 이하 15%, 초과 12% 세액공제 (연 900만원 한도).</li>
+      <li>환급금은 보통 다음 해 2월 급여에 반영됩니다.</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+  <GovSupport page="yearend-tax" />
+</BaseLayout>

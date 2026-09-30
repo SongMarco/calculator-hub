@@ -40,6 +40,11 @@ const calculators = [
     desc: '2026년 공제율 17%·15%로 내 월세 환급액을 계산해 보세요. 총급여 구간별 한도를 바로 확인합니다.',
   },
   {
+    href: u('/yearend-tax/'), tag: '환급 미리보기', img: `${IMG}/card-yearend-tax.webp`,
+    title: '연말정산 미리보기 계산기',
+    desc: '총급여·인적공제·연금계좌로 2026년 연말정산 환급 예상액을 미리 계산하세요.',
+  },
+  {
     href: u('/rent-conversion/'), tag: '법정 상한 확인', img: `${IMG}/card-rent-conversion.webp`,
     title: '전월세 전환율 계산기',
     desc: '보증금을 월세로·월세를 보증금으로 바꿀 때 적정 금액을 계산하고 법정 상한을 확인하세요.',
@@ -83,7 +88,7 @@ const calculators = [
 
 const upcoming = [
   '알바 퇴직금 계산기',
-  '국민연금 예상수령액', '연말정산 환급금 계산기',
+  '국민연금 예상수령액',
 ];
 ---
 <BaseLayout
