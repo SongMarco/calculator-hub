@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { u } from '../../lib/paths.js';
+import Faq from '../../components/Faq.astro';
+import GovSupport from '../../components/GovSupport.astro';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
+
+const faqs = [
+  {
+    q: '실업급여의 정확한 이름은 뭔가요?',
+    a: '일상적으로 실업급여라고 부르지만, 퇴직 후 재취업 활동을 하며 받는 급여의 정확한 명칭은 구직급여입니다. 이 계산기는 그 구직급여 예상액을 계산합니다.',
+  },
+  {
+    q: '자진퇴사도 받을 수 있나요?',
+    a: '원칙적으로 비자발적 이직(권고사직·계약만료·폐업 등)이 대상입니다. 다만 임금체불·직장 내 괴롭힘·건강상 이유·왕복 3시간 이상 통근·가족 간병·육아 등 법에서 인정하는 정당한 사유가 있으면 자진퇴사도 수급자격을 인정받을 수 있습니다. 고용센터(1350)에 확인하세요.',
+  },
+  {
+    q: '지급일수는 어떻게 정해지나요?',
+    a: '이직 당시 나이와 고용보험 가입기간으로 정해집니다. 50세 미만은 1년 미만 120일부터 10년 이상 240일까지, 50세 이상·장애인은 1년 미만 120일부터 10년 이상 270일까지 단계적으로 늘어납니다.',
+  },
+  {
+    q: '신청은 언제까지 해야 하나요?',
+    a: '이직 다음 날부터 12개월 안에만 받을 수 있습니다. 기간이 지나면 남은 일수가 있어도 지급되지 않으므로 퇴직 후 빨리 신청하세요. 고용24에서 구직등록과 사전교육을 마친 뒤 거주지 관할 고용센터에 수급자격을 신청합니다.',
+  },
+  {
+    q: '이 계산 결과와 실제 지급액이 다를 수 있나요?',
+    a: '네. 이 계산기는 간이 추정치입니다. 실제 1일 지급액은 고용보험이 산정한 평균임금(상여금·수당 포함 방식이 다를 수 있음)을 기준으로 하고, 하한액도 1일 소정근로시간에 따라 달라집니다. 고용24 모의계산으로 최종 확인하세요.',
+  },
+];
+---
+<BaseLayout
+  title="실업급여(구직급여) 계산기"
+  description="2026년 실업급여 예상 수령액을 계산하세요. 평균임금의 60%·1일 상한 68,100원·지급일수 120~270일 기준 모의계산."
+  keywords="실업급여 계산기, 2026 실업급여, 구직급여 계산기, 구직급여 모의계산, 실업급여 얼마"
+  path="/unemployment/"
+  ogImage="/images/card-unemployment.webp"
+  jsonLd={faqJsonLd(faqs, pageUrl("/unemployment/"))}
+>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; 실업급여(구직급여) 계산기</p>
+  <h1 class="page-title">실업급여(구직급여) 계산기</h1>
+  <p class="page-desc">이직 전 평균임금과 고용보험 가입기간을 입력하면 2026년 기준 예상 수령액을 계산해 드립니다.</p>
+  <p class="updated">2026년 지급 기준 적용 · 최종 업데이트 2026-09-30</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label for="wage">이직 전 3개월 1일 평균임금 (원)</label>
+      <input id="wage" type="number" value="120000" min="0" />
+      <div class="hint">최근 3개월 총임금 ÷ 총일수 (대략 월급 ÷ 30)</div>
+    </div>
+    <div class="field">
+      <label for="years">고용보험 가입기간 (년)</label>
+      <input id="years" type="number" value="5" min="0" step="0.5" />
+      <div class="hint">이전 직장 기간 합산 가능 (예: 2년 6개월 → 2.5)</div>
+    </div>
+    <div class="field">
+      <label>나이·장애 조건</label>
+      <div class="radio-row">
+        <label><input type="radio" name="senior" value="n" checked /> 50세 미만</label>
+        <label><input type="radio" name="senior" value="y" /> 50세 이상 또는 장애인</label>
+      </div>
+      <div class="hint">50세 이상·장애인은 소정급여일수가 더 깁니다</div>
+    </div>
+    <button class="btn" id="calc-btn">수령액 계산하기</button>
+
+    <div class="result" id="result">
+      <div>예상 총 수령액</div>
+      <div class="big" id="r-total">-</div>
+      <div class="row" id="r-detail" style="margin-top:12px"></div>
+      <p class="note" id="r-note"></p>
+      <p class="note">간이 추정치이며, 수급자격(18개월 중 180일 이상·비자발적 이직 등)과 별개입니다. 실제 지급액은 고용24 모의계산으로 확인하세요.</p>
+    </div>
+  </section>
+
+  <script>
+    import { calcUnemployment } from '../../lib/unemployment.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    $('calc-btn').addEventListener('click', () => {
+      const senior = document.querySelector('input[name="senior"]:checked').value === 'y';
+      const r = calcUnemployment({ avgWage: num('wage'), years: num('years'), senior });
+      $('r-total').textContent = fmt(r.total);
+      $('r-detail').innerHTML =
+        `<div><span>1일 지급액</span><strong>${fmt(r.daily)}</strong></div>` +
+        `<div><span>소정급여일수</span><strong>${r.days}일</strong></div>`;
+      const note = r.cappedHigh
+        ? '평균임금이 높아 2026년 상한(1일 68,100원)이 적용되었습니다.'
+        : r.cappedLow
+          ? '2026년 하한(1일 66,048원, 8시간 기준)이 적용되었습니다.'
+          : '상한·하한에 걸리지 않아 평균임금의 60%가 그대로 적용되었습니다.';
+      $('r-note').textContent = note;
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>📖 2026년 구직급여 지급 기준</h2>
+    <table>
+      <tr><th>구분</th><th>기준</th></tr>
+      <tr><td>1일 지급액</td><td>이직 전 3개월 평균임금의 60%</td></tr>
+      <tr><td>1일 상한액</td><td>68,100원</td></tr>
+      <tr><td>1일 하한액</td><td>66,048원 (1일 8시간 기준)</td></tr>
+      <tr><td>지급일수</td><td>120~270일 (나이·가입기간별)</td></tr>
+    </table>
+    <h3>소정급여일수 표 (2019.10.1 이후 이직자)</h3>
+    <table>
+      <tr><th>가입기간</th><th>50세 미만</th><th>50세 이상·장애인</th></tr>
+      <tr><td>1년 미만</td><td>120일</td><td>120일</td></tr>
+      <tr><td>1년 이상 3년 미만</td><td>150일</td><td>180일</td></tr>
+      <tr><td>3년 이상 5년 미만</td><td>180일</td><td>210일</td></tr>
+      <tr><td>5년 이상 10년 미만</td><td>210일</td><td>240일</td></tr>
+      <tr><td>10년 이상</td><td>240일</td><td>270일</td></tr>
+    </table>
+    <h3>꼭 알아두세요</h3>
+    <ul>
+      <li>상한과 하한의 차이가 2,052원밖에 되지 않아, 총액을 좌우하는 건 사실상 <strong>소정급여일수</strong>입니다.</li>
+      <li>이직 전 18개월 중 고용보험 피보험단위기간 180일 이상 + 비자발적 이직이 기본 요건입니다.</li>
+      <li>이직 다음 날부터 12개월 안에만 받을 수 있습니다.</li>
+      <li>신청 순서: 고용24 구직등록 → 수급자격 사전교육 → 거주지 관할 고용센터 방문 신청 → 1~4주마다 실업인정.</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+  <GovSupport page="unemployment" />
+</BaseLayout>

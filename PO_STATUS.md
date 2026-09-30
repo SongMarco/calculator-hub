@@ -31,3 +31,8 @@
 - 404 페이지 신규 (noindex). BaseLayout에 noindex prop 추가.
 - docs/keywords.md 우선순위 표에 구현 완료 표시, 허브 upcoming 목록 갱신.
 - 빌드 15페이지, 테스트 65/65, 푸시 완료.
+
+## 2026-09-30 11:00 KST — 한부모 육아휴직 특례 추가·푸시
+- /parental/에 한부모 토글: 1~3개월 상한 300만원(일반 250만원). lib singleParent 옵션 + 테스트 2개 추가.
+- FAQ·keywords 메타에 '한부모 육아휴직 특례' 키워드 반영. docs/keywords.md #8 구현 표시.
+- 테스트 67/67, 빌드 15페이지, 푸시 완료.

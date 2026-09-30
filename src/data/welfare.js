@@ -110,7 +110,7 @@ export const PROGRAMS = [
     url: 'https://www.work24.go.kr',
     urlLabel: '고용24에서 구직등록·모의계산하기',
     income: { type: 'none' },
-    pages: ['severance'],
+    pages: ['severance', 'unemployment'],
   },
   {
     id: 'didimdol',
