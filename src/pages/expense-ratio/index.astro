@@ -84,6 +84,8 @@ const faqs = [
       <div class="hint">인적용역 기준 3,600만원 미만이면 단순경비율 적용 가능</div>
     </div>
     <button class="btn" id="calc-btn">비교하기</button>
+    <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+    <p class="share-msg" id="share-msg" role="status"></p>
 
     <div class="result" id="result">
       <div id="r-verdict">-</div>
@@ -101,6 +103,7 @@ const faqs = [
 
   <script>
     import { calcExpenseRatio } from '../../lib/expense-ratio.js';
+    import { initShareLink } from '../../lib/share.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
@@ -134,6 +137,7 @@ const faqs = [
         : '직전연도 수입이 기준을 초과해 단순경비율 적용이 어렵습니다. 기준경비율 추계보다 간편장부 작성이 유리할 수 있으니 세무 상담을 권장합니다.';
       $('result').classList.add('show');
     });
+    initShareLink();
   </script>
 
   <section class="article">

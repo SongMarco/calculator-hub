@@ -84,6 +84,8 @@ const faqs = [
       <input id="months" type="number" inputmode="decimal" value="0" min="0" max="11" />
     </div>
     <button class="btn" id="calc-btn">퇴직금 계산하기</button>
+    <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+    <p class="share-msg" id="share-msg" role="status"></p>
 
     <div class="result" id="result">
       <div>세후 실수령액 (추정)</div>
@@ -95,6 +97,13 @@ const faqs = [
         <tr><td>퇴직소득세 + 지방소득세</td><td id="r-tax">-</td></tr>
       </table>
       <p class="note">회사 취업규칙·단체협약이 법정 기준보다 유리하면 그 기준이 우선합니다.</p>
+      <div class="viz-bar" id="r-viz" hidden>
+        <div class="track">
+          <div class="seg-net" id="r-viz-net"></div>
+          <div class="seg-tax" id="r-viz-tax"></div>
+        </div>
+        <div class="legend"><span><i style="background:#2563eb"></i>실수령액 <b id="r-viz-net-p"></b></span><span><i style="background:#f59e0b"></i>세금 <b id="r-viz-tax-p"></b></span></div>
+      </div>
     </div>
   </section>
 
@@ -102,6 +111,7 @@ const faqs = [
 
   <script>
     import { calcSeverance } from '../../lib/severance.js';
+    import { initShareLink } from '../../lib/share.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
@@ -119,7 +129,20 @@ const faqs = [
       $('r-gross').textContent = fmt(r.gross);
       $('r-tax').textContent = fmt(r.totalTax);
       $('result').classList.add('show');
+      // 실수령액 vs 세금 시각 막대
+      const vizTotal = r.net + r.totalTax;
+      if (vizTotal > 0) {
+        const netP = (r.net / vizTotal) * 100;
+        $('r-viz-net').style.width = netP.toFixed(1) + '%';
+        $('r-viz-tax').style.width = (100 - netP).toFixed(1) + '%';
+        $('r-viz-net-p').textContent = Math.round(netP) + '%';
+        $('r-viz-tax-p').textContent = Math.round(100 - netP) + '%';
+        $('r-viz').hidden = false;
+      } else {
+        $('r-viz').hidden = true;
+      }
     });
+    initShareLink();
   </script>
 
   <section class="article">

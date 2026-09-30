@@ -103,6 +103,15 @@ const faqs = [
       </table>
       <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
       <p class="share-msg" id="share-msg" role="status"></p>
+      <details class="cmp">
+        <summary>🔀 다른 연봉과 비교하기 (A vs B)</summary>
+        <div class="field row">
+          <label for="cmp-annual">비교할 연봉 (만원)</label>
+          <input id="cmp-annual" type="number" inputmode="decimal" value="7000" min="0" />
+          <button type="button" class="btn" id="cmp-btn">비교하기</button>
+        </div>
+        <div id="cmp-result"></div>
+      </details>
       <p class="note">연간 세액을 12로 나눈 추정치로, 실제 월 원천징수액(간이세액표 기준)과 다를 수 있습니다.</p>
     </div>
   </section>
@@ -117,6 +126,7 @@ const faqs = [
 
     // 계산 방향 모드: fwd(세전→세후) / rev(세후→세전)
     let mode = 'fwd';
+    let lastAnnualMan = 0; // 마지막 계산에 쓰인 연봉(만원) — A/B 비교의 A안
     const FWD_CHIPS = [[3000, '3,000만원'], [4000, '4,000만원'], [5000, '5,000만원'], [7000, '7,000만원'], [10000, '1억원']];
     const REV_CHIPS = [[200, '월 200만원'], [250, '월 250만원'], [300, '월 300만원'], [400, '월 400만원'], [500, '월 500만원']];
     const renderChips = () => {
@@ -151,6 +161,7 @@ const faqs = [
         annualMan = reverseSalary(num('annual') * 10000, nontax, dep) / 10000;
       }
       const r = calcSalary({ annualSalary: annualMan * 10000, nonTaxableMonthly: nontax, dependents: dep });
+      lastAnnualMan = annualMan;
       $('r-net').textContent = mode === 'fwd'
         ? fmt(r.netMonthly)
         : '약 ' + Math.round(annualMan).toLocaleString('ko-KR') + '만원';
@@ -187,6 +198,29 @@ const faqs = [
       $('result').classList.add('show');
     };
     $('calc-btn').addEventListener('click', runCalc);
+    // A vs B 연봉 비교: 같은 비과세·부양가족 조건으로 두 연봉을 나란히 비교
+    $('cmp-btn').addEventListener('click', () => {
+      const nontax = num('nontax') * 10000;
+      const dep = Math.max(1, Math.floor(num('dependents')));
+      const aMan = lastAnnualMan || num('annual');
+      const bMan = num('cmp-annual');
+      if (!aMan || !bMan) return;
+      const A = calcSalary({ annualSalary: aMan * 10000, nonTaxableMonthly: nontax, dependents: dep });
+      const B = calcSalary({ annualSalary: bMan * 10000, nonTaxableMonthly: nontax, dependents: dep });
+      const man = (n) => '약 ' + Math.round(n).toLocaleString('ko-KR') + '만원';
+      const delta = (d) => {
+        const s = Math.round(d).toLocaleString('ko-KR');
+        return `<span class="${d >= 0 ? 'up' : 'down'}">${d >= 0 ? '+' : '−'}${s.replace('-', '')}원</span>`;
+      };
+      $('cmp-result').innerHTML = `
+        <div class="table-scroll"><table class="rate">
+          <tr><th>항목</th><th>A (${man(aMan)})</th><th>B (${man(bMan)})</th><th>차이 (B−A)</th></tr>
+          <tr><td>월 실수령액</td><td>${fmt(A.netMonthly)}</td><td>${fmt(B.netMonthly)}</td><td>${delta(B.netMonthly - A.netMonthly)}</td></tr>
+          <tr><td>월 소득세 등</td><td>${fmt(A.taxMonthly)}</td><td>${fmt(B.taxMonthly)}</td><td>${delta(B.taxMonthly - A.taxMonthly)}</td></tr>
+          <tr><td>월 4대보험</td><td>${fmt(A.insuranceMonthly)}</td><td>${fmt(B.insuranceMonthly)}</td><td>${delta(B.insuranceMonthly - A.insuranceMonthly)}</td></tr>
+        </table></div>
+        <p class="note">같은 월 비과세·부양가족 조건 기준 추정치입니다.</p>`;
+    });
     // 연봉 퀵버튼: 클릭 즉시 입력값 세팅 + 자동 계산
     $('salary-chips').addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-v]');

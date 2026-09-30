@@ -74,6 +74,8 @@ const faqs = [
       <div class="hint">본인 기본 150만원. 부양가족 있으면 추가</div>
     </div>
     <button class="btn" id="calc-btn">환급 예상액 계산하기</button>
+    <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+    <p class="share-msg" id="share-msg" role="status"></p>
 
     <div class="result" id="result">
       <div id="r-label">환급 예상액</div>
@@ -94,6 +96,7 @@ const faqs = [
 
   <script>
     import { calcRefund33 } from '../../lib/refund33.js';
+    import { initShareLink } from '../../lib/share.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => { const v = $(id).value.replace(/,/g, ''); return v === '' ? null : (parseFloat(v) || 0); };
@@ -113,6 +116,7 @@ const faqs = [
       $('r-prepaid').textContent = fmt(r.prepaid);
       $('result').classList.add('show');
     });
+    initShareLink();
   </script>
 
   <section class="article">

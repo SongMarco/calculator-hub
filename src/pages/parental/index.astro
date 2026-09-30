@@ -80,6 +80,8 @@ const faqs = [
       <div class="hint">「한부모가족지원법」상 한부모 근로자는 첫 3개월 상한이 300만원으로 높아집니다</div>
     </div>
     <button class="btn" id="calc-btn">급여 계산하기</button>
+    <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+    <p class="share-msg" id="share-msg" role="status"></p>
 
     <div class="result" id="result">
       <div>휴직 기간 총 예상 급여</div>
@@ -96,6 +98,7 @@ const faqs = [
 
   <script>
     import { calcParentalLeave } from '../../lib/parental.js';
+    import { initShareLink } from '../../lib/share.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
@@ -107,6 +110,7 @@ const faqs = [
         `<tr><td>${s.month}개월차</td><td>${fmt(s.pay)}</td></tr>`).join('');
       $('result').classList.add('show');
     });
+    initShareLink();
   </script>
 
   <section class="article">

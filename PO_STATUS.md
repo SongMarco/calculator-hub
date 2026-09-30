@@ -166,3 +166,18 @@
 - 테스트 120/120 (avg-down.test.js 11개 신규: 수량 0·단가 0·음수 → null, 역계산 already/impossible/invalid)
 - 빌드 22페이지 (Vercel 루트·GH Pages /calculator-hub/ 둘 다 검증, sitemap·FAQPage JSON-LD·광고슬롯 포함 확인)
 - 푸시: 53af5c17fc0cd8081a012cbce9a1d9191082b755
+
+## 2026-09-30 14:40 KST — Wave 3 (공유·재방문·체류시간) 완료·푸시
+목표: 공유·재방문·체류시간을 올리는 기능 3종 (광고·뉴스레터·GA·서치콘솔 손대지 않음)
+### 1. 결과 공유링크 전 페이지 확대 (salary 제외 17종)
+- `src/lib/share.js` 신설: `.calc` 섹션 입력 자동 탐지 (text/select/radio/checkbox), URL 쿼리 인코딩→복사, 접속 시 복원+calc-btn 자동 클릭
+- salary는 기존 bespoke 공유 유지, 나머지 17페이지에 공유 버튼+`initShareLink()` 기계적 삽입 (버튼은 calc-btn 바로 뒤, 전역 `.btn-share` 스타일 재사용)
+- `tests/share.test.js` 9개 신규 (인코딩·복원·round-trip·라디오/체크박스)
+### 2. salary A/B 연봉 비교
+- 결과 영역에 `<details>` 비교 패널: 비교할 연봉 입력 → 같은 비과세·부양가족 조건으로 A vs B 나란히 비교 (월 실수령액·월 소득세·월 4대보험 + 차이 Δ)
+- `lastAnnualMan` 저장으로 역계산 모드 결과와도 비교 가능
+### 3. 퇴직금 시각화
+- 결과에 실수령액 vs 세금 스택 막대 (경량 div, global.css `.viz-bar`), 0원 가드 포함
+### 검증
+- 테스트 129/129 (share 9개 신규), 빌드 22페이지 (Vercel 루트·GH Pages /calculator-hub/ 양쪽 검증)
+- 광고 정책 준수: 새 광고 단위 없음, 기존 배치 그대로

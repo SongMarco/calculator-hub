@@ -76,6 +76,8 @@ const faqs = [
       <div class="hint">50세 이상·장애인은 소정급여일수(받을 수 있는 날짜 수)가 더 깁니다</div>
     </div>
     <button class="btn" id="calc-btn">수령액 계산하기</button>
+    <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+    <p class="share-msg" id="share-msg" role="status"></p>
 
     <div class="result" id="result">
       <div>예상 총 수령액</div>
@@ -90,6 +92,7 @@ const faqs = [
 
   <script>
     import { calcUnemployment } from '../../lib/unemployment.js';
+    import { initShareLink } from '../../lib/share.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
@@ -108,6 +111,7 @@ const faqs = [
       $('r-note').textContent = note;
       $('result').classList.add('show');
     });
+    initShareLink();
   </script>
 
   <section class="article">

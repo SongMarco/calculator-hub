@@ -76,6 +76,8 @@ const faqs = [
       <div class="hint">알면 입력하세요. 세액공제는 결정세액을 초과할 수 없습니다</div>
     </div>
     <button class="btn" id="calc-btn">공제액 계산하기</button>
+    <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+    <p class="share-msg" id="share-msg" role="status"></p>
 
     <div class="result" id="result">
       <div>예상 세액공제액 (연간)</div>
@@ -94,6 +96,7 @@ const faqs = [
 
   <script>
     import { calcRentCredit } from '../../lib/monthly-rent.js';
+    import { initShareLink } from '../../lib/share.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
@@ -115,6 +118,7 @@ const faqs = [
           : '세액공제는 산출된 세금에서 직접 차감되므로 절세 효과가 큽니다.');
       $('result').classList.add('show');
     });
+    initShareLink();
   </script>
 
   <section class="article">

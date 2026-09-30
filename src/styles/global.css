@@ -506,3 +506,19 @@ img { max-width: 100%; }
 .donut-legend { display: flex; flex-direction: column; gap: 7px; font-size: .87rem; }
 .donut-legend strong { font-size: .9rem; margin-bottom: 2px; }
 .donut-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; }
+/* A/B 비교 (salary) */
+.cmp { margin: 18px 0 6px; border: 1px solid var(--line); border-radius: 14px; padding: 4px 16px 12px; background: var(--card); }
+.cmp summary { cursor: pointer; font-weight: 800; padding: 12px 0; font-size: .98rem; }
+.cmp .field.row { display: flex; align-items: flex-end; gap: 10px; }
+.cmp .field.row label { margin-bottom: 0; white-space: nowrap; }
+.cmp .field.row input { max-width: 160px; }
+.cmp .field.row .btn { flex: none; padding: 12px 18px; }
+.up { color: #047857; font-weight: 800; }
+.down { color: #b91c1c; font-weight: 800; }
+/* 퇴직금 시각화 막대 */
+.viz-bar { margin: 14px 0 4px; }
+.viz-bar .track { display: flex; height: 26px; border-radius: 999px; overflow: hidden; background: #eef2f7; }
+.viz-bar .seg-net { background: linear-gradient(90deg, #2563eb, #3b82f6); }
+.viz-bar .seg-tax { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.viz-bar .legend { display: flex; gap: 16px; margin-top: 8px; font-size: .85rem; color: var(--muted); }
+.viz-bar .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }

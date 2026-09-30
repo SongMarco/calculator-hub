@@ -72,6 +72,8 @@ const faqs = [
       <input id="months" type="number" value="6" min="0" max="11" inputmode="numeric" />
     </div>
     <button class="btn" id="calc-btn">퇴직금 계산하기</button>
+    <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+    <p class="share-msg" id="share-msg" role="status"></p>
 
     <div class="result" id="result">
       <div id="r-elig" class="elig">-</div>
@@ -93,6 +95,7 @@ const faqs = [
 
   <script>
     import { calcParttimeSeverance } from '../../lib/parttime-severance.js';
+    import { initShareLink } from '../../lib/share.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
@@ -122,6 +125,7 @@ const faqs = [
       $('r-tax').textContent = fmt(r.totalTax);
       $('result').classList.add('show');
     });
+    initShareLink();
   </script>
 
   <section class="article">

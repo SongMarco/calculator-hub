@@ -67,6 +67,8 @@ const faqs = [
         <input id="add-qty" type="number" inputmode="decimal" value="100" min="0" />
       </div>
       <button class="btn" id="calc-btn">물타기 결과 계산하기</button>
+      <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+      <p class="share-msg" id="share-msg" role="status"></p>
 
       <div class="result" id="result">
         <div id="r-label">물타기 후 평단가</div>
@@ -120,6 +122,7 @@ const faqs = [
 
   <script>
     import { calcAvgDown, calcReverseAvgDown } from '../../lib/avg-down.js';
+    import { initShareLink } from '../../lib/share.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const fmtQty = (n) => (Math.round(n * 100) / 100).toLocaleString('ko-KR') + '주';
@@ -174,6 +177,7 @@ const faqs = [
       $('rv-total-cost').textContent = fmt(qty * avgPrice + r.addCost);
       $('rv-result').classList.add('show');
     });
+    initShareLink();
   </script>
 
   <section class="article">

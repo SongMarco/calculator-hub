@@ -74,6 +74,8 @@ const faqs = [
       <div class="hint">매월 원천징수된 소득세 합계 (지방소득세 제외)</div>
     </div>
     <button class="btn" id="calc-btn">환급액 계산하기</button>
+    <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+    <p class="share-msg" id="share-msg" role="status"></p>
 
     <div class="result" id="result">
       <div id="r-label">예상 환급액</div>
@@ -90,6 +92,7 @@ const faqs = [
 
   <script>
     import { calcYearEndTax } from '../../lib/yearend-tax.js';
+    import { initShareLink } from '../../lib/share.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
@@ -113,6 +116,7 @@ const faqs = [
       ].map(([k, v]) => `<tr><td>${k}</td><td>${fmt(v)}</td></tr>`).join('');
       $('result').classList.add('show');
     });
+    initShareLink();
   </script>
 
   <section class="article">

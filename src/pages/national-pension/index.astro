@@ -72,6 +72,8 @@ const faqs = [
       <div class="hint">1인당 연 204,360원 가산 (자녀 19세 미만·부모 60세 이상)</div>
     </div>
     <button class="btn" id="calc-btn">예상액 계산하기</button>
+    <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+    <p class="share-msg" id="share-msg" role="status"></p>
 
     <div class="result" id="result">
       <div>예상 월 수령액</div>
@@ -88,6 +90,7 @@ const faqs = [
 
   <script>
     import { calcNationalPension } from '../../lib/national-pension.js';
+    import { initShareLink } from '../../lib/share.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
@@ -103,6 +106,7 @@ const faqs = [
       $('r-dep').textContent = fmt(r.dependentMonthly);
       $('result').classList.add('show');
     });
+    initShareLink();
   </script>
 
   <section class="article">
