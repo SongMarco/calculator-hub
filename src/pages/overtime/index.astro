@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { u } from '../../lib/paths.js';
+import Faq from '../../components/Faq.astro';
+import GovSupport from '../../components/GovSupport.astro';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
+
+const faqs = [
+  {
+    q: '연장·야간·휴일 수당 가산율은 어떻게 되나요?',
+    a: '연장근로는 통상임금의 50%를, 야간근로(22시~익일 6시)는 50%를 가산합니다. 휴일근로는 8시간까지 50%, 8시간을 초과한 분은 100%를 가산합니다. 연장근로를 야간에 하면 두 가산이 중복 적용됩니다.',
+  },
+  {
+    q: '5인 미만 사업장도 받을 수 있나요?',
+    a: '아닙니다. 5인 미만 사업장에는 연장·야간·휴일 가산수당 규정이 적용되지 않습니다. 다만 주휴수당과 최저임금은 적용됩니다.',
+  },
+  {
+    q: '통상시급을 모르는데 어떻게 입력하나요?',
+    a: '월급제라면 (월급 ÷ 월 소정근로시간)으로 대략 계산할 수 있습니다. 주 40시간 기준 월 소정근로시간은 209시간입니다. 정확한 통상임금은 임금대장·근로계약서를 기준으로 회사에 확인하세요.',
+  },
+  {
+    q: '주휴수당과 중복으로 받을 수 있나요?',
+    a: '네. 주휴수당은 1주 15시간 이상 근무 시 지급되는 별도 수당으로, 연장·야간·휴일 가산수당과 별개로 계산됩니다.',
+  },
+];
+---
+<BaseLayout
+  title="연장·야간·휴일 수당 계산기"
+  description="연장·야간·휴일근로 가산수당을 계산하세요. 연장·야간 50% 가산, 휴일 8시간 초과 100% 가산 기준."
+  keywords="연장수당 계산기, 야간수당 계산기, 휴일근로수당 계산기, 시간외수당 계산"
+  path="/overtime/"
+  ogImage="/images/card-overtime.webp"
+  jsonLd={faqJsonLd(faqs, pageUrl("/overtime/"))}
+>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; 연장·야간·휴일 수당 계산기</p>
+  <h1 class="page-title">연장·야간·휴일 수당 계산기</h1>
+  <p class="page-desc">통상시급과 시간외 근무 시간을 입력하면 가산수당을 항목별로 계산해 드립니다.</p>
+  <p class="updated">근로기준법 가산율 기준 · 최종 업데이트 2026-09-30</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label for="wage">통상시급 (원)</label>
+      <input id="wage" type="number" value="12000" min="0" />
+      <div class="hint">2026년 최저시급 10,320원 · 월급제면 월급 ÷ 209시간</div>
+    </div>
+    <div class="field">
+      <label for="overtime">연장근로 시간 (주간)</label>
+      <input id="overtime" type="number" value="5" min="0" step="0.5" />
+      <div class="hint">1.5배 적용</div>
+    </div>
+    <div class="field">
+      <label for="night">야간근로 시간 (22시~익일 6시)</label>
+      <input id="night" type="number" value="0" min="0" step="0.5" />
+      <div class="hint">1.5배 적용 · 연장과 겹치면 중복 가산</div>
+    </div>
+    <div class="field">
+      <label for="holiday">휴일근로 시간 (8시간 이내)</label>
+      <input id="holiday" type="number" value="0" min="0" step="0.5" />
+      <div class="hint">1.5배 적용</div>
+    </div>
+    <div class="field">
+      <label for="holidayOver">휴일근로 시간 (8시간 초과분)</label>
+      <input id="holidayOver" type="number" value="0" min="0" step="0.5" />
+      <div class="hint">2배 적용</div>
+    </div>
+    <button class="btn" id="calc-btn">수당 계산하기</button>
+
+    <div class="result" id="result">
+      <div>시간외 수당 합계</div>
+      <div class="big" id="r-total">-</div>
+      <table>
+        <tr><th>항목</th><th>시간</th><th>수당</th></tr>
+        <tbody id="r-rows"></tbody>
+      </table>
+      <p class="note">5인 미만 사업장에는 가산수당 규정이 적용되지 않습니다. 간이 추정치이며 실제 지급액은 임금대장 기준으로 확인하세요.</p>
+    </div>
+  </section>
+
+  <script>
+    import { calcOvertimePay } from '../../lib/overtime.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    $('calc-btn').addEventListener('click', () => {
+      const r = calcOvertimePay({
+        hourlyWage: num('wage'),
+        overtime: num('overtime'),
+        night: num('night'),
+        holiday: num('holiday'),
+        holidayOver: num('holidayOver'),
+      });
+      const rows = [
+        ['연장근로 (1.5배)', r.breakdown.overtime],
+        ['야간근로 (1.5배)', r.breakdown.night],
+        ['휴일근로 8h 이내 (1.5배)', r.breakdown.holiday],
+        ['휴일근로 8h 초과 (2배)', r.breakdown.holidayOver],
+      ].filter(([, b]) => b.hours > 0);
+      $('r-total').textContent = fmt(r.total);
+      $('r-rows').innerHTML = rows.length
+        ? rows.map(([label, b]) => `<tr><td>${label}</td><td>${b.hours}시간</td><td>${fmt(b.pay)}</td></tr>`).join('')
+        : '<tr><td colspan="3">입력된 시간외 근무가 없습니다</td></tr>';
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>📖 시간외 수당 가산율 정리</h2>
+    <table>
+      <tr><th>구분</th><th>기준</th><th>가산율</th></tr>
+      <tr><td>연장근로</td><td>1일 8시간·1주 40시간 초과</td><td>50% 가산 (1.5배)</td></tr>
+      <tr><td>야간근로</td><td>22:00 ~ 익일 06:00</td><td>50% 가산 (1.5배)</td></tr>
+      <tr><td>휴일근로</td><td>8시간까지</td><td>50% 가산 (1.5배)</td></tr>
+      <tr><td>휴일근로</td><td>8시간 초과분</td><td>100% 가산 (2배)</td></tr>
+    </table>
+    <h3>꼭 알아두세요</h3>
+    <ul>
+      <li>연장근로를 야간 시간대(22시~6시)에 하면 연장 가산과 야간 가산이 <strong>중복 적용</strong>됩니다.</li>
+      <li><strong>5인 미만 사업장</strong>에는 가산수당 규정이 적용되지 않습니다.</li>
+      <li>통상시급 = 월급 ÷ 월 소정근로시간 (주 40시간 기준 209시간).</li>
+      <li>이 계산기는 주휴수당과 별개이며, 함께 받을 수 있습니다.</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+  <GovSupport page="overtime" />
+</BaseLayout>
