@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { u } from '../../lib/paths.js';
+import Faq from '../../components/Faq.astro';
+import GovSupport from '../../components/GovSupport.astro';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
+
+const faqs = [
+  {
+    q: '전월세 전환율이 뭔가요?',
+    a: '전세 보증금의 일부 또는 전부를 월세로 바꿀 때 적용하는 연간 비율입니다. 보증금을 얼마나 줄이는 대신 월세를 얼마 낼지를 정하는 기준이 되며, 반대로 월세를 보증금으로 바꿀 때도 같은 비율로 계산합니다.',
+  },
+  {
+    q: '법정 상한은 어떻게 정해지나요?',
+    a: '주택임대차보호법 시행령 제9조에 따라 "연 10%"와 "한국은행 기준금리 + 2%p" 중 낮은 쪽이 상한입니다. 기준금리가 3.00%면 상한은 5.00%가 됩니다. 기준금리는 변동되므로 계약 시점의 금리를 확인하세요.',
+  },
+  {
+    q: '법정 상한은 언제 적용되나요?',
+    a: '이미 살고 있는 집에서 계약 기간 중이나 갱신할 때 보증금의 전부·일부를 월세로 바꾸는 경우에 적용됩니다. 새 집을 처음 계약할 때는 집주인과 세입자가 합의한 금액이 우선하므로 시장 전환율이 상한보다 높을 수도 있습니다.',
+  },
+  {
+    q: '전환율이 높으면 누구에게 유리한가요?',
+    a: '보증금을 월세로 바꿀 때 전환율이 높으면 임차인의 월세 부담이 커집니다. 반대로 월세를 보증금으로 바꿀 때는 전환율이 높을수록 같은 월세로 더 적은 보증금을 내게 됩니다.',
+  },
+];
+---
+<BaseLayout
+  title="전월세 전환율 계산기"
+  description="전세 보증금을 월세로, 월세를 전세 보증금으로 바꿀 때 적정 금액을 계산하세요. 2026년 법정 전환율 상한 확인 포함."
+  keywords="전월세 전환율 계산기, 전세 월세 전환 계산, 법정 전월세전환율, 보증금 월세 전환"
+  path="/rent-conversion/"
+  ogImage="/images/card-rent-conversion.webp"
+  jsonLd={faqJsonLd(faqs, pageUrl("/rent-conversion/"))}
+>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; 전월세 전환율 계산기</p>
+  <h1 class="page-title">전월세 전환율 계산기</h1>
+  <p class="page-desc">보증금↔월세 전환 시 적정 금액과 2026년 법정 상한을 함께 계산해 드립니다.</p>
+  <p class="updated">법정 상한 = min(연 10%, 기준금리 + 2%p) · 최종 업데이트 2026-09-30</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label>전환 방향</label>
+      <div class="radio-row">
+        <label><input type="radio" name="dir" value="toMonthly" checked /> 전세 → 월세</label>
+        <label><input type="radio" name="dir" value="toDeposit" /> 월세 → 전세</label>
+      </div>
+    </div>
+    <div class="field" id="f-amount">
+      <label for="amount">줄이는 보증금 (만원)</label>
+      <input id="amount" type="number" value="10000" min="0" />
+      <div class="hint" id="amount-hint">월세로 돌리는 보증금 감액분</div>
+    </div>
+    <div class="field">
+      <label for="rate">적용 전환율 (%/연)</label>
+      <input id="rate" type="number" value="5" min="0" step="0.1" />
+      <div class="hint" id="rate-hint">법정 상한: 5.00% (기준금리 3.00% + 2%p)</div>
+    </div>
+    <div class="field">
+      <label for="base">한국은행 기준금리 (%/연)</label>
+      <input id="base" type="number" value="3" min="0" step="0.05" />
+      <div class="hint">2026년 9월 기준 3.00%. 변동되므로 계약 시점 금리로 확인하세요</div>
+    </div>
+    <button class="btn" id="calc-btn">전환 금액 계산하기</button>
+
+    <div class="result" id="result">
+      <div id="r-label">예상 월세</div>
+      <div class="big" id="r-value">-</div>
+      <p class="note" id="r-note"></p>
+    </div>
+  </section>
+
+  <script>
+    import { legalMaxRate, depositToMonthly, monthlyToDeposit } from '../../lib/rent-conversion.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+
+    const dirRadios = document.querySelectorAll('input[name="dir"]');
+    function syncLabels() {
+      const dir = document.querySelector('input[name="dir"]:checked').value;
+      if (dir === 'toMonthly') {
+        $('f-amount').querySelector('label').textContent = '줄이는 보증금 (만원)';
+        $('amount-hint').textContent = '월세로 돌리는 보증금 감액분';
+        $('r-label').textContent = '예상 월세';
+      } else {
+        $('f-amount').querySelector('label').textContent = '줄이는 월세 (만원)';
+        $('amount-hint').textContent = '보증금으로 돌리는 월세 감액분';
+        $('r-label').textContent = '예상 보증금 증액분';
+      }
+    }
+    dirRadios.forEach((r) => r.addEventListener('change', syncLabels));
+
+    $('calc-btn').addEventListener('click', () => {
+      const dir = document.querySelector('input[name="dir"]:checked').value;
+      const amount = num('amount') * 10000;
+      const rate = num('rate');
+      const max = legalMaxRate(num('base'));
+      $('rate-hint').textContent = `법정 상한: ${max.toFixed(2)}% (기준금리 ${num('base')}% + 2%p)`;
+      const value = dir === 'toMonthly'
+        ? depositToMonthly({ depositDrop: amount, rate })
+        : monthlyToDeposit({ monthly: amount, rate });
+      $('r-value').textContent = fmt(value);
+      $('r-note').textContent = rate > max
+        ? `⚠️ 입력한 전환율(${rate}%)이 법정 상한(${max.toFixed(2)}%)을 초과합니다. 계약 중·갱신 시 전환에는 상한이 적용되니 확인하세요.`
+        : `입력한 전환율은 법정 상한(${max.toFixed(2)}%) 이내입니다. (신규 계약은 당사자 합의 우선)`;
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>📖 전월세 전환율, 이렇게 계산합니다</h2>
+    <table>
+      <tr><th>방향</th><th>공식</th></tr>
+      <tr><td>전세 → 월세</td><td>월세 = 보증금 감액분 × 전환율 ÷ 12</td></tr>
+      <tr><td>월세 → 전세</td><td>보증금 증액분 = 월세 × 12 ÷ 전환율</td></tr>
+    </table>
+    <h3>법정 상한 기준</h3>
+    <ul>
+      <li>주택임대차보호법 시행령 제9조: <strong>연 10%</strong>와 <strong>기준금리 + 2%p</strong> 중 낮은 쪽</li>
+      <li>기준금리 3.00% 기준 상한은 <strong>연 5.00%</strong> (보증금 1억원 → 월세 상한 약 41.7만원)</li>
+      <li>적용 대상: 거주 중인 집의 계약 기간 중·갱신 시 보증금↔월세 전환</li>
+      <li>신규 계약은 당사자 합의가 우선하므로 시장 전환율이 상한보다 높을 수 있습니다</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+  <GovSupport page="rent-conversion" />
+</BaseLayout>
