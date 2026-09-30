@@ -25,3 +25,9 @@
 - 공통 lib: src/lib/income-tax.js (2026년 세율표). 테스트 65/65 통과. 카드 이미지 3종 AI 생성.
 - GovSupport 매핑: first-home-tax→디딤돌/버팀목, refund33→근로장려금, expense-ratio→두루누리.
 - 빌드 14페이지 성공, 푸시 완료.
+
+## 2026-09-30 10:35 KST — SEO/내부링크 개선 완료·푸시
+- 신규 계산기 교차 링크: freelancer→refund33/expense-ratio, dsr→first-home-tax.
+- 404 페이지 신규 (noindex). BaseLayout에 noindex prop 추가.
+- docs/keywords.md 우선순위 표에 구현 완료 표시, 허브 upcoming 목록 갱신.
+- 빌드 15페이지, 테스트 65/65, 푸시 완료.

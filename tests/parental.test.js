@@ -35,3 +35,16 @@ test('엣지 케이스', () => {
   const over = calcParentalLeave({ monthlyWage: 3_000_000, months: 30 });
   assert.equal(over.months, 18); // 최대 18개월로 제한
 });
+
+test('한부모 특례: 1~3개월 상한 300만원', () => {
+  const r = calcParentalLeave({ monthlyWage: 4_000_000, months: 3, singleParent: true });
+  assert.equal(r.schedule[0].pay, 3_000_000);
+  assert.equal(r.schedule[0].cap, 3_000_000);
+  assert.equal(r.singleParent, true);
+});
+
+test('한부모 특례: 4개월차부터는 일반과 동일', () => {
+  const r = calcParentalLeave({ monthlyWage: 4_000_000, months: 4, singleParent: true });
+  assert.equal(r.schedule[3].cap, 2_000_000);
+  assert.equal(r.schedule[3].pay, 2_000_000);
+});

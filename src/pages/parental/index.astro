@@ -19,6 +19,10 @@ const faqs = [
     a: '생후 18개월 이내 자녀에 대해 부모가 함께 육아휴직을 사용하면 첫 6개월간 상한이 높아지는 특례입니다(1개월차 최대 200만원부터 6개월차 최대 450만원까지 단계적 상향). 이 계산기는 일반 육아휴직 기준이므로 특례 해당 시 고용보험 모의계산으로 별도 확인하세요.',
   },
   {
+    q: '한부모도 더 받을 수 있나요?',
+    a: '네. 「한부모가족지원법」상 한부모 근로자는 첫 3개월의 상한이 월 300만원으로 높아집니다(일반 250만원). 4~6개월차 200만원, 7개월 이후 160만원은 일반과 동일합니다. 위 계산기에서 한부모 특례를 선택하면 반영됩니다.',
+  },
+  {
     q: '아빠도 받을 수 있나요?',
     a: '네. 육아휴직과 급여는 부모 각각에게 적용됩니다. 조건을 충족하면 아빠도 동일하게 신청할 수 있습니다.',
   },
@@ -31,7 +35,7 @@ const faqs = [
 <BaseLayout
   title="2026년 육아휴직 급여 계산기"
   description="2026년 육아휴직 급여 지급 기준(1~3개월 최대 250만원)으로 휴직 기간별 예상 수령액을 계산하세요. 월별 지급 스케줄 제공."
-  keywords="육아휴직 급여 계산기, 2026 육아휴직 급여, 육아휴직 급여 상한"
+  keywords="육아휴직 급여 계산기, 2026 육아휴직 급여, 육아휴직 급여 상한, 한부모 육아휴직 특례"
   path="/parental/"
   ogImage="/images/card-parental.webp"
   jsonLd={faqJsonLd(faqs, pageUrl("/parental/"))}
@@ -53,6 +57,14 @@ const faqs = [
       <input id="months" type="number" value="12" min="1" max="18" />
       <div class="hint">기본 최대 1년, 조건 충족 시 1년 6개월</div>
     </div>
+    <div class="field">
+      <label>한부모 특례</label>
+      <div class="radio-row">
+        <label><input type="radio" name="single" value="n" checked /> 아니오</label>
+        <label><input type="radio" name="single" value="y" /> 예 (1~3개월 상한 300만원)</label>
+      </div>
+      <div class="hint">「한부모가족지원법」상 한부모 근로자는 첫 3개월 상한이 300만원으로 높아집니다</div>
+    </div>
     <button class="btn" id="calc-btn">급여 계산하기</button>
 
     <div class="result" id="result">
@@ -72,7 +84,8 @@ const faqs = [
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
     $('calc-btn').addEventListener('click', () => {
-      const r = calcParentalLeave({ monthlyWage: num('wage') * 10000, months: Math.floor(num('months')) });
+      const singleParent = document.querySelector('input[name="single"]:checked').value === 'y';
+      const r = calcParentalLeave({ monthlyWage: num('wage') * 10000, months: Math.floor(num('months')), singleParent });
       $('r-total').textContent = fmt(r.total);
       $('r-schedule').innerHTML = r.schedule.map((s) =>
         `<tr><td>${s.month}개월차</td><td>${fmt(s.pay)}</td></tr>`).join('');
