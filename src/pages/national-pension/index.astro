@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { u } from '../../lib/paths.js';
+import Faq from '../../components/Faq.astro';
+import GovSupport from '../../components/GovSupport.astro';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
+
+const faqs = [
+  {
+    q: '국민연금은 얼마나 내고 얼마나 받나요?',
+    a: '보험료는 월소득의 9%(직장인은 회사와 절반씩)이며, 10년 이상 가입하면 노령연금을 받습니다. 수령액은 가입기간이 길수록, 가입 중 평균소득이 높을수록 늘어납니다. 위 계산기에 가입기간과 월 평균소득을 넣어 예상액을 확인해 보세요.',
+  },
+  {
+    q: 'A값과 B값이 뭔가요?',
+    a: 'A값은 전체 가입자의 평균소득월액(2026년 3,193,511원), B값은 본인의 가입기간 중 평균소득월액입니다. 연금액 산식 1.2×(A값+B값)에 가입기간 계수를 곱해 기본연금액이 정해집니다. 이 계산기는 B값 대신 현재 월소득을 그대로 사용한 간이 계산입니다.',
+  },
+  {
+    q: '10년을 못 채우면 어떻게 되나요?',
+    a: '10년(120개월) 미만 가입자는 연금 대신 일시금(반환일시금)을 받습니다. 이 계산기는 최소 120개월을 가정하므로, 그 미만이면 국민연금공단에서 반환일시금을 확인하세요.',
+  },
+  {
+    q: '이 계산 결과와 공단 예상액이 다를 수 있나요?',
+    a: '네. 실제 연금액은 과거 소득을 현재가치로 재평가한 B값으로 계산되며, 소득 변동·납부예외 기간 등이 반영됩니다. 이 계산기는 현재 소득이 계속 유지된다고 가정한 추정치이므로, 국민연금공단 "내 연금 알아보기"에서 정확한 예상액을 확인하세요.',
+  },
+];
+---
+<BaseLayout
+  title="국민연금 예상수령액 계산기"
+  description="국민연금 노령연금 예상 수령액을 계산하세요. 2026년 A값 3,193,511원·가입기간별 지급률 반영 간이 계산."
+  keywords="국민연금 예상수령액, 국민연금 계산기, 노령연금 계산기, 국민연금 수령액 조회"
+  path="/national-pension/"
+  ogImage="/images/card-national-pension.webp"
+  jsonLd={faqJsonLd(faqs, pageUrl("/national-pension/"))}
+>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; 국민연금 예상수령액 계산기</p>
+  <h1 class="page-title">국민연금 예상수령액 계산기</h1>
+  <p class="page-desc">가입기간과 월 평균소득을 입력하면 2026년 기준 노령연금 예상 월 수령액을 계산해 드립니다.</p>
+  <p class="updated">2026년 A값 3,193,511원 기준 · 최종 업데이트 2026-09-30</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label for="years">가입기간 (년)</label>
+      <input id="years" type="number" value="20" min="10" max="50" />
+      <div class="hint">최소 10년, 20년 기준 100%</div>
+    </div>
+    <div class="field">
+      <label for="income">월 평균소득 (만원)</label>
+      <input id="income" type="number" value="300" min="0" />
+      <div class="hint">가입기간 중 평균 월소득 (현재 소득으로 가정)</div>
+    </div>
+    <div class="field">
+      <label for="spouse">배우자 부양</label>
+      <div class="radio-row">
+        <label><input type="radio" name="spouse" value="n" checked /> 없음</label>
+        <label><input type="radio" name="spouse" value="y" /> 있음 (연 306,630원 가산)</label>
+      </div>
+    </div>
+    <div class="field">
+      <label for="others">부양 자녀·부모 수</label>
+      <input id="others" type="number" value="0" min="0" />
+      <div class="hint">1인당 연 204,360원 가산 (자녀 19세 미만·부모 60세 이상)</div>
+    </div>
+    <button class="btn" id="calc-btn">예상액 계산하기</button>
+
+    <div class="result" id="result">
+      <div>예상 월 수령액</div>
+      <div class="big" id="r-monthly">-</div>
+      <div class="row" style="margin-top:12px">
+        <div><span>기본연금 (월)</span><strong id="r-base">-</strong></div>
+        <div><span>부양가족 가산 (월)</span><strong id="r-dep">-</strong></div>
+      </div>
+      <p class="note">소득 재평가·조기/연기연금 미반영 간이 추정치입니다. 정확한 예상액은 국민연금공단 "내 연금 알아보기"에서 확인하세요.</p>
+    </div>
+  </section>
+
+  <script>
+    import { calcNationalPension } from '../../lib/national-pension.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    $('calc-btn').addEventListener('click', () => {
+      const r = calcNationalPension({
+        monthlyIncome: num('income') * 10000,
+        months: Math.floor(num('years') * 12),
+        spouse: document.querySelector('input[name="spouse"]:checked').value === 'y' ? 1 : 0,
+        others: Math.floor(num('others')),
+      });
+      $('r-monthly').textContent = fmt(r.monthly);
+      $('r-base').textContent = fmt(r.monthlyBase);
+      $('r-dep').textContent = fmt(r.dependentMonthly);
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>📖 국민연금 수령액, 이렇게 계산됩니다</h2>
+    <p><strong>기본연금액(연액) = 1.2 × (A값 + B값) × 가입기간 계수</strong></p>
+    <table>
+      <tr><th>가입기간</th><th>계수</th></tr>
+      <tr><td>10년 (120개월)</td><td>50%</td></tr>
+      <tr><td>15년 (180개월)</td><td>75%</td></tr>
+      <tr><td>20년 (240개월)</td><td>100%</td></tr>
+      <tr><td>30년 (360개월)</td><td>150%</td></tr>
+    </table>
+    <p>20년 미만이면 1개월당 5%/12씩 차감, 20년 초과면 같은 비율로 가산됩니다.</p>
+    <h3>꼭 알아두세요</h3>
+    <ul>
+      <li>A값(2026년 3,193,511원)은 전체 가입자 평균으로 매년 바뀝니다.</li>
+      <li>실제 B값은 과거 소득을 현재가치로 <strong>재평가</strong>해 산정하므로 이 계산보다 보통 높게 나옵니다.</li>
+      <li>10년 미만 가입자는 연금 대신 반환일시금을 받습니다.</li>
+      <li>수급 개시 후에는 매년 물가변동률만큼 연금액이 조정됩니다.</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+  <GovSupport page="national-pension" />
+</BaseLayout>
