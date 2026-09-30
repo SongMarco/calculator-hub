@@ -399,3 +399,18 @@ img { max-width: 100%; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* ---------- AdSense 수동 광고 단위 (절제 배치) ---------- */
+/* 여백+구분선으로 은은하게 처리. "광고" 라벨은 정책상 구분 표시에 필요한 최소 크기. */
+.ad-slot {
+  margin: 40px 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.ad-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: .12em;
+  color: var(--faint);
+  margin-bottom: 8px;
+}

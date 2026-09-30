@@ -1,0 +1,170 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { u } from '../../lib/paths.js';
+import Faq from '../../components/Faq.astro';
+import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
+import { faqJsonLd, pageUrl } from '../../lib/seo.js';
+
+const faqs = [
+  {
+    q: '주 15시간이 안 되는 주도 있는데 받을 수 있나요?',
+    a: '퇴직 직전 4주 평균으로 봅니다. 4주 동안의 1주 소정근로시간 평균이 15시간 이상이면 됩니다. 한두 주만 적었다고 바로 탈락하는 게 아니니, 4주 평균을 먼저 계산해 보세요.',
+  },
+  {
+    q: '사장님이 "퇴직금 안 주기로 했다"며 계약서에 서명했는데요?',
+    a: '퇴직금은 강행규정이라 당사자 합의로 없앨 수 없습니다. 계약서에 "퇴직금 없음"이라고 쓰고 서명했더라도 그 부분은 무효이고, 조건(1년 이상·주 15시간 이상)만 맞으면 퇴직금을 청구할 수 있습니다.',
+  },
+  {
+    q: '1년 되기 한 달 전에 그만두면 정말 0원인가요?',
+    a: '법정 퇴직금은 계속근로기간 1년 이상부터 발생하므로 11개월 근속이면 법적으로는 0원입니다. 다만 회사 취업규칙이나 단체협약에서 더 유리하게 정했다면 그 기준이 우선합니다.',
+  },
+  {
+    q: '주휴수당도 퇴직금 계산에 들어가나요?',
+    a: '주휴수당을 별도로 받았다면 퇴직 전 3개월 임금에 포함되어 평균임금이 올라갑니다. 시급에 주휴수당이 포함된 포괄임금제라면 이미 시급에 녹아 있으니 "별도로 받아요"를 꺼 주세요.',
+  },
+  {
+    q: '월급제 알바로 일했는데 이 계산기로 되나요?',
+    a: '이 계산기는 시급제 전용입니다. 월급제라면 퇴직 전 3개월 임금을 직접 입력하는 퇴직금 계산기를 이용하세요. 계산 방식(평균임금 × 30일 × 근속연수)은 동일합니다.',
+  },
+];
+---
+<BaseLayout
+  title="알바 퇴직금 계산기 (주휴수당 포함)"
+  description="시급·주당 근무시간만 입력하면 알바 퇴직금을 계산해 드립니다. 주휴수당 포함, 통상임금 하한 적용, 1년·주 15시간 수급 자격까지 자동 판정."
+  keywords="알바 퇴직금 계산기, 아르바이트 퇴직금, 주휴수당 퇴직금 포함, 편의점 알바 퇴직금, 단시간근로자 퇴직금"
+  path="/parttime-severance/"
+  ogImage="/images/card-parttime-severance.webp"
+  jsonLd={faqJsonLd(faqs, pageUrl("/parttime-severance/"))}
+>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; 알바 퇴직금 계산기</p>
+  <h1 class="page-title">알바 퇴직금 계산기 (주휴수당 포함)</h1>
+  <p class="page-desc">시급과 주당 근무시간만 입력하면 받을 수 있는지부터, 주휴수당을 포함한 예상 퇴직금까지 계산해 드립니다.</p>
+  <p class="updated">2026년 기준 (최저시급 10,320원) · 최종 업데이트 2026-09-30</p>
+
+  <section class="calc">
+    <h2>🧮 계산하기</h2>
+    <div class="field">
+      <label for="wage">시급 (원)</label>
+      <input id="wage" type="number" value="10320" min="0" inputmode="numeric" />
+      <div class="hint">2026년 최저시급 10,320원</div>
+    </div>
+    <div class="field">
+      <label for="hours">1주 소정근로시간 (시간)</label>
+      <input id="hours" type="number" value="20" min="0" max="52" inputmode="decimal" />
+      <div class="hint">계약서상 정해진 시간 (주휴 제외). 퇴직 직전 4주 평균</div>
+    </div>
+    <div class="field">
+      <label for="days">주 근무일수 (일)</label>
+      <input id="days" type="number" value="5" min="1" max="7" inputmode="numeric" />
+    </div>
+    <div class="field check">
+      <label><input id="holiday" type="checkbox" checked /> 주휴수당을 별도로 받아요</label>
+      <div class="hint">시급에 주휴수당이 포함된 포괄임금제라면 체크 해제</div>
+    </div>
+    <div class="field">
+      <label for="years">재직기간 (년)</label>
+      <input id="years" type="number" value="1" min="0" inputmode="numeric" />
+    </div>
+    <div class="field">
+      <label for="months">재직기간 (개월, 년 제외)</label>
+      <input id="months" type="number" value="6" min="0" max="11" inputmode="numeric" />
+    </div>
+    <button class="btn" id="calc-btn">퇴직금 계산하기</button>
+
+    <div class="result" id="result">
+      <div id="r-elig" class="elig">-</div>
+      <div>예상 퇴직금 (세후 추정)</div>
+      <div class="big" id="r-net">-</div>
+      <table>
+        <tr><th>항목</th><th>금액</th></tr>
+        <tr><td>주휴수당 (주)</td><td id="r-holiday">-</td></tr>
+        <tr><td>1일 평균임금</td><td id="r-avg">-</td></tr>
+        <tr><td>1일 통상임금</td><td id="r-contract">-</td></tr>
+        <tr><td>세전 퇴직금</td><td id="r-gross">-</td></tr>
+        <tr><td>퇴직소득세 + 지방소득세</td><td id="r-tax">-</td></tr>
+      </table>
+      <p class="note">3개월 임금 = 주급 × 13주, 총일수 91일 기준 추정치입니다. 실제 지급액은 수당 포함 범위·결근·상여 등에 따라 달라질 수 있습니다.</p>
+    </div>
+  </section>
+
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
+
+  <script>
+    import { calcParttimeSeverance } from '../../lib/parttime-severance.js';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+    const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+    $('calc-btn').addEventListener('click', () => {
+      const tenureDays = Math.floor(num('years')) * 365 + Math.floor(num('months')) * 30;
+      const weeklyHours = num('hours');
+      const r = calcParttimeSeverance({
+        hourlyWage: num('wage'),
+        weeklyHours,
+        weeklyDays: Math.max(1, Math.floor(num('days'))),
+        holidaySeparate: $('holiday').checked,
+        tenureDays,
+      });
+      const elig = $('r-elig');
+      if (r.eligibility.eligible) {
+        elig.className = 'elig ok';
+        elig.textContent = '✅ 받을 수 있어요 — 1년 이상 · 주 15시간 이상 충족';
+      } else {
+        elig.className = 'elig no';
+        elig.textContent = '⚠️ 법정 퇴직금 대상이 아니에요 — ' + r.eligibility.reasons.join(' / ');
+      }
+      $('r-net').textContent = fmt(r.net);
+      $('r-holiday').textContent = fmt(r.holidayPay);
+      $('r-avg').textContent = fmt(r.avgDaily) + (r.appliedFloor ? ' (통상임금 적용)' : '');
+      $('r-contract').textContent = fmt(r.dailyContract);
+      $('r-gross').textContent = fmt(r.gross);
+      $('r-tax').textContent = fmt(r.totalTax);
+      $('result').classList.add('show');
+    });
+  </script>
+
+  <section class="article">
+    <h2>계산 방법</h2>
+    <p><strong>주휴수당 (주)</strong> = (1주 소정근로시간 ÷ 40) × 8 × 시급. 주 20시간·시급 10,320원이면 주 41,280원입니다.</p>
+    <p><strong>3개월 임금</strong> = (시급 × 주당 시간 + 주휴수당) × 13주, <strong>1일 평균임금</strong> = 3개월 임금 ÷ 91일</p>
+    <p><strong>1일 통상임금</strong> = 시급 × (1주 소정근로시간 ÷ 주 근무일수). 평균임금이 통상임금보다 낮으면 통상임금으로 계산합니다. 달력일(주말 포함)로 나누는 평균임금은 시급제 알바에서 통상임금보다 낮게 나오는 경우가 많아, 실제로는 통상임금이 적용되는 일이 흔합니다.</p>
+    <p><strong>퇴직금(세전)</strong> = 적용 1일 금액 × 30일 × (재직일수 ÷ 365). 퇴직소득세는 근속연수공제 덕분에 1~2년 근속이면 대부분 0원입니다.</p>
+    <h2>📝 계산 예시</h2>
+    <p>시급 10,320원 × 주 20시간(주 5일) × 1년 6개월, 주휴수당 별도 수령:</p>
+    <ul>
+      <li>주휴수당: (20 ÷ 40) × 8 × 10,320원 = <strong>주 41,280원</strong></li>
+      <li>1일 평균임금 35,383원 &lt; 1일 통상임금 41,280원 → <strong>41,280원 적용</strong></li>
+      <li>세전 퇴직금: 41,280원 × 30 × 1.5년 ≈ <strong>1,859,296원</strong> (세금 0원)</li>
+    </ul>
+    <h2>꼭 알아두세요</h2>
+    <ul>
+      <li><strong>받을 수 있는 조건은 딱 두 가지</strong>: 계속근로 1년 이상 + 퇴직 직전 4주 평균 주 소정근로시간 15시간 이상. 알바·계약직도 조건만 맞으면 정규직과 동일합니다.</li>
+      <li>퇴직금은 퇴직일로부터 <strong>14일 이내</strong>에 지급되어야 하며, 2022년 4월부터는 IRP 계좌로 받는 게 원칙입니다.</li>
+      <li>14일이 지나도 안 들어오면 고용노동부(국번 없이 <strong>1350</strong>)에 임금체불 진정을 넣을 수 있습니다.</li>
+      <li>이 계산기는 3개월을 13주로 추정한 값이라 실제와 수만 원 차이 날 수 있습니다. 정확한 금액은 급여명세서의 세전 임금 총액을 기준으로 퇴직금 계산기에서 다시 계산해 보세요.</li>
+    </ul>
+  </section>
+
+  <Faq items={faqs} />
+
+  <GovSupport page="severance" />
+
+  <section class="related">
+    <h2>관련 계산기</h2>
+    <div class="grid">
+      <a class="card" href={u("/severance/")}><h3>퇴직금 계산기</h3><p>월급제·상여금 반영</p></a>
+      <a class="card" href={u("/hourly-wage/")}><h3>주휴 포함 시급 계산기</h3><p>2026년 10,320원 기준</p></a>
+      <a class="card" href={u("/overtime/")}><h3>연장·야간·휴일 수당</h3><p>가산임금 계산</p></a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .field.check label { display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+  .field.check input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--brand); }
+  .elig { font-weight: 800; font-size: 1.05rem; margin-bottom: 10px; padding: 12px 14px; border-radius: 12px; }
+  .elig.ok { background: #ecfdf5; color: #047857; }
+  .elig.no { background: #fef2f2; color: #b91c1c; }
+</style>
+</BaseLayout>

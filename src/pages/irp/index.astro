@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
 import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
@@ -81,6 +83,8 @@ const faqs = [
     </div>
   </section>
 
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
+
   <script>
     import { calcIrp } from '../../lib/irp.js';
     const $ = (id) => document.getElementById(id);
@@ -127,6 +131,8 @@ const faqs = [
       <li>건강보험료 측면에서도 연금 분할 수령이 유리할 수 있습니다.</li>
     </ul>
   </section>
+
+  <AdSlot slotId={AD_SLOTS.IN_CONTENT} />
 
   <Faq items={faqs} />
 

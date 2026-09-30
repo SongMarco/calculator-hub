@@ -40,15 +40,20 @@ export function convertedSalaryDeduction(converted) {
  * @param {number} [opts.bonusAnnual=0] 연간 상여금 총액 (원)
  * @param {number} [opts.leavePay=0] 미사용 연차수당 (원)
  * @param {number} opts.tenureDays 재직일수
+ * @param {number} [opts.minDaily=0] 1일 통상임금 하한 (평균임금이 이보다 낮으면 이 값 적용)
  */
-export function calcSeverance({ wages3mo, days3mo, bonusAnnual = 0, leavePay = 0, tenureDays }) {
+export function calcSeverance({ wages3mo, days3mo, bonusAnnual = 0, leavePay = 0, tenureDays, minDaily = 0 }) {
   wages3mo = Math.max(0, wages3mo || 0);
   days3mo = Math.max(1, Math.floor(days3mo || 1));
   bonusAnnual = Math.max(0, bonusAnnual || 0);
   leavePay = Math.max(0, leavePay || 0);
   tenureDays = Math.max(0, Math.floor(tenureDays || 0));
+  minDaily = Math.max(0, minDaily || 0);
 
-  const avgDaily = (wages3mo + (bonusAnnual * 3) / 12 + (leavePay * 3) / 12) / days3mo;
+  const avgDailyRaw = (wages3mo + (bonusAnnual * 3) / 12 + (leavePay * 3) / 12) / days3mo;
+  // 평균임금이 통상임금보다 낮으면 통상임금으로 계산 (근로기준법)
+  const avgDaily = Math.max(avgDailyRaw, minDaily);
+  const appliedFloor = avgDailyRaw < minDaily;
   const years = tenureDays / 365;
   const gross = avgDaily * 30 * years;
 
@@ -68,6 +73,8 @@ export function calcSeverance({ wages3mo, days3mo, bonusAnnual = 0, leavePay = 0
 
   return {
     avgDaily: Math.round(avgDaily),
+    avgDailyRaw: Math.round(avgDailyRaw),
+    appliedFloor,
     years: Math.round(years * 100) / 100,
     taxYears: Math.round(taxYears * 100) / 100,
     gross: Math.round(gross),

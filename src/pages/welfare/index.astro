@@ -2,6 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import { PROGRAMS, MEDIAN_INCOME_2026 } from '../../data/welfare.js';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
 
 // 연봉 구간 피라미드 (2024년 귀속 국세청 연말정산 통계 기반 대략적 근로소득 분포)
 // share: 해당 구간 인구 비중(%), upper: null = 상한 없음
@@ -159,6 +161,8 @@ function criterionText(p) {
     </ul>
     <p class="note">2026년 9월 기준이며, 실제 신청 조건은 공식 사이트에서 확인하세요.</p>
   </section>
+
+  <AdSlot slotId={AD_SLOTS.IN_CONTENT} />
 
   <script define:vars={{ median: MEDIAN_INCOME_2026, brackets: BRACKETS }}>
     let household = 1;

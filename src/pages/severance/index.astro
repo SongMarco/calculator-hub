@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
 import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
@@ -84,6 +86,8 @@ const faqs = [
     </div>
   </section>
 
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
+
   <script>
     import { calcSeverance } from '../../lib/severance.js';
     const $ = (id) => document.getElementById(id);
@@ -125,6 +129,8 @@ const faqs = [
       <li>퇴직소득은 종합소득 합산이 아닌 <strong>분류과세</strong>라 연말정산과 별개입니다.</li>
     </ul>
   </section>
+
+  <AdSlot slotId={AD_SLOTS.IN_CONTENT} />
 
   <Faq items={faqs} />
 

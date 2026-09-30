@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
 import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
@@ -59,6 +61,8 @@ const faqs = [
       <p class="note">필요경비를 제외한 금액이 과세 기준이지만, 이 계산기는 지급액 전체 기준 간이 계산입니다. 종합소득세 신고 시 정산됩니다.</p>
     </div>
   </section>
+
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
 
   <script>
     import { calcFreelancer } from '../../lib/freelancer.js';

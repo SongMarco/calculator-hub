@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
 import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
@@ -72,6 +74,8 @@ const faqs = [
     </div>
   </section>
 
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
+
   <script>
     import { calcUnemployment } from '../../lib/unemployment.js';
     const $ = (id) => document.getElementById(id);
@@ -120,6 +124,8 @@ const faqs = [
       <li>신청 순서: 고용24 구직등록 → 수급자격 사전교육 → 거주지 관할 고용센터 방문 신청 → 1~4주마다 실업인정.</li>
     </ul>
   </section>
+
+  <AdSlot slotId={AD_SLOTS.IN_CONTENT} />
 
   <Faq items={faqs} />
   <GovSupport page="unemployment" />

@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
 import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
@@ -73,6 +75,8 @@ const faqs = [
       <p class="note">소득 재평가·조기/연기연금 미반영 간이 추정치입니다. 정확한 예상액은 국민연금공단 "내 연금 알아보기"에서 확인하세요.</p>
     </div>
   </section>
+
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
 
   <script>
     import { calcNationalPension } from '../../lib/national-pension.js';

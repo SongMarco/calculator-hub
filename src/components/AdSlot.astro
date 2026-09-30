@@ -1,0 +1,28 @@
+---
+/**
+ * AdSense 수동 광고 단위.
+ * 슬롯 ID는 src/lib/ads.js 상수를 참조 — 하드코딩 금지.
+ * "광고" 라벨을 작게 표기해 광고/콘텐츠를 구분 (AdSense 정책).
+ */
+import { AD_CLIENT, AD_FORMAT, AD_FULL_WIDTH_RESPONSIVE } from '../lib/ads.js';
+
+interface Props {
+  slotId: string;
+}
+
+const { slotId } = Astro.props;
+---
+<div class="ad-slot" aria-label="광고">
+  <span class="ad-label">광고</span>
+  <ins
+    class="adsbygoogle"
+    style="display:block"
+    data-ad-client={AD_CLIENT}
+    data-ad-slot={slotId}
+    data-ad-format={AD_FORMAT}
+    data-full-width-responsive={AD_FULL_WIDTH_RESPONSIVE}
+  ></ins>
+  <script is:inline>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>

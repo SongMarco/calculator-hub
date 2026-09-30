@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
 import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
@@ -75,6 +77,8 @@ const faqs = [
       <p class="note">세액공제·다른 소득은 반영하지 않은 간이 계산입니다. 실제 환급액은 5월 신고 시 확정됩니다.</p>
     </div>
   </section>
+
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
 
   <script>
     import { calcRefund33 } from '../../lib/refund33.js';

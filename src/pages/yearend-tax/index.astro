@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
 import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
@@ -71,6 +73,8 @@ const faqs = [
       <p class="note">신용카드·의료비·교육비·기부금 등 다른 공제는 미반영된 간이 계산입니다. 홈택스 미리보기로 최종 확인하세요.</p>
     </div>
   </section>
+
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
 
   <script>
     import { calcYearEndTax } from '../../lib/yearend-tax.js';

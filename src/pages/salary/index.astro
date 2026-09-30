@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
 import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
@@ -75,6 +77,8 @@ const faqs = [
     </div>
   </section>
 
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
+
   <script>
     import { calcSalary } from '../../lib/salary.js';
     const $ = (id) => document.getElementById(id);
@@ -116,6 +120,8 @@ const faqs = [
     </ul>
   </section>
 
+  <AdSlot slotId={AD_SLOTS.IN_CONTENT} />
+
   <Faq items={faqs} />
 
   <GovSupport page="salary" />
@@ -124,6 +130,7 @@ const faqs = [
     <h2>관련 계산기</h2>
     <div class="grid">
       <a class="card" href={u("/severance/")}><h3>퇴직금 계산기</h3><p>세후 실수령액까지 계산</p></a>
+      <a class="card" href={u("/parttime-severance/")}><h3>알바 퇴직금 계산기</h3><p>시급제·주휴수당 포함</p></a>
       <a class="card" href={u("/freelancer/")}><h3>프리랜서 3.3% 계산기</h3><p>원천징수 후 실수령액</p></a>
       <a class="card" href={u("/yearend-tax/")}><h3>연말정산 미리보기 계산기</h3><p>환급 예상액 미리 계산</p></a>
       <a class="card" href={u("/dsr/")}><h3>DSR 계산기</h3><p>대출 가능 여부 가늠</p></a>

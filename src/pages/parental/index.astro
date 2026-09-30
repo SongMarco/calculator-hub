@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
 import GovSupport from '../../components/GovSupport.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { AD_SLOTS } from '../../lib/ads.js';
 import { faqJsonLd, pageUrl } from '../../lib/seo.js';
 
 const faqs = [
@@ -77,6 +79,8 @@ const faqs = [
       <p class="note">일반 육아휴직 기준이며, 6+6 부모함께육아휴직 특례는 별도 기준이 적용됩니다.</p>
     </div>
   </section>
+
+  <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
 
   <script>
     import { calcParentalLeave } from '../../lib/parental.js';
