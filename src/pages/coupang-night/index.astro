@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -163,6 +164,8 @@ const faqs = [
       <li>일급 외에 <strong>공정수당·인센티브</strong>가 붙는 센터도 있으니 공고의 "급여 구분"을 꼭 확인하세요.</li>
     </ul>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["고용노동부 최저임금 고시(2026년 10,320원)", "근로기준법 야간근로 가산 규정"]} />
 
   <Faq items={faqs} />
   <GovSupport page="coupang-night" />

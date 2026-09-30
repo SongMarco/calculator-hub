@@ -95,6 +95,7 @@ const faqs = [
   <section class="w-list" id="w-list">
     <h2 id="w-list-title">🏛️ 정부 지원금 11종</h2>
     <p class="w-list-sub" id="w-list-sub">구간을 선택하면 해당 구간의 지원금 클러스터를 보여드립니다.</p>
+    <p><button type="button" class="btn-share" id="w-share" hidden>🔗 내 결과 공유하기</button></p>
     {PROGRAMS.map((p) => (
       <article
         class="w-card"
@@ -150,7 +151,8 @@ const faqs = [
         <input type="checkbox" id="nl-consent" />
         <span><strong>[필수]</strong> 뉴스레터 발송을 위한 개인정보 수집·이용에 동의합니다.
         수집 항목: 이메일 주소, 연봉 구간, 가구원 수 / 보유·이용 기간: 구독 해지 시까지 /
-        동의를 거부할 수 있으나, 거부 시 뉴스레터 구독이 불가능합니다.</span>
+        동의를 거부할 수 있으나, 거부 시 뉴스레터 구독이 불가능합니다.
+        (<a href={u("/privacy/")} target="_blank" rel="noopener">개인정보처리방침 보기</a>)</span>
       </label>
       <button type="submit" class="btn-welfare" id="nl-submit">알림 신청하기</button>
       <p class="nl-msg" id="nl-msg" role="status" aria-live="polite"></p>
@@ -293,6 +295,7 @@ const faqs = [
             ? '이 구간에서 받을 수 있는 지원금이 없습니다.'
             : `이 구간에서 ${okCount}개는 확실히 받을 수 있고, ${shown - okCount}개는 연봉에 따라 확인이 필요합니다.`;
       }
+      document.getElementById('w-share').hidden = !br;
     }
 
     document.querySelectorAll('.pyr-bar').forEach((btn) => {
@@ -302,6 +305,7 @@ const faqs = [
         document.querySelectorAll('.pyr-bar').forEach((b) =>
           b.classList.toggle('active', b.dataset.id === selected)
         );
+        persist();
         render();
       });
     });
@@ -311,12 +315,66 @@ const faqs = [
         document.querySelectorAll('#w-household button').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
         household = parseInt(btn.dataset.hh, 10);
+        persist();
         refreshCounts();
         render();
       });
     });
     onlyOkEl.addEventListener('change', render);
 
+    // --- 내 구간 저장 + 결과 공유 (성장) ---
+    const LS_KEY = 'ch-welfare-bracket';
+    const shareBtn = document.getElementById('w-share');
+    function persist() {
+      try { localStorage.setItem(LS_KEY, JSON.stringify({ b: selected, hh: household })); } catch (_) {}
+    }
+    function applySelectionToUI() {
+      document.querySelectorAll('.pyr-bar').forEach((b) =>
+        b.classList.toggle('active', b.dataset.id === selected)
+      );
+      document.querySelectorAll('#w-household button').forEach((b) =>
+        b.classList.toggle('active', parseInt(b.dataset.hh, 10) === household)
+      );
+    }
+    function restore() {
+      const validB = (id) => brackets.some((b) => b.id === id);
+      const validHh = (h) => [1, 2, 3, 4].includes(h);
+      const q = new URLSearchParams(location.search);
+      const qb = q.get('b');
+      const qh = parseInt(q.get('hh'), 10);
+      if (qb && validB(qb)) {
+        selected = qb;
+        if (validHh(qh)) household = qh;
+        applySelectionToUI();
+        return true;
+      }
+      try {
+        const s = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+        if (s && validB(s.b)) {
+          selected = s.b;
+          if (validHh(s.hh)) household = s.hh;
+          applySelectionToUI();
+          return true;
+        }
+      } catch (_) {}
+      return false;
+    }
+    shareBtn.addEventListener('click', async () => {
+      if (!selected) return;
+      const url = `${location.origin}${location.pathname}?b=${selected}&hh=${household}`;
+      const done = () => {
+        shareBtn.textContent = '✅ 링크 복사됨';
+        setTimeout(() => { shareBtn.textContent = '🔗 내 결과 공유하기'; }, 2000);
+      };
+      try {
+        await navigator.clipboard.writeText(url);
+        done();
+      } catch (_) {
+        prompt('아래 링크를 복사하세요', url);
+      }
+    });
+
+    restore();
     refreshCounts();
     render();
   </script>

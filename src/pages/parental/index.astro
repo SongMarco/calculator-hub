@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -132,6 +133,8 @@ const faqs = [
     </ol>
     <div class="example-box"><strong>💡 예시로 이해하기</strong><br>통상임금 월 300만원인 근로자가 12개월 휴직하면, 1~3개월차 월 250만원(상한) × 3 = 750만원, 4~6개월차 월 200만원 × 3 = 600만원, 7~12개월차 월 160만원 × 6 = 960만원으로 총 약 2,310만원을 받습니다.</div>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["고용노동부 육아휴직 급여 안내"]} />
 
   <Faq items={faqs} />
 

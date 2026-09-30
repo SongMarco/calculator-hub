@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -142,6 +143,8 @@ const faqs = [
   </section>
 
   <AdSlot slotId={AD_SLOTS.IN_CONTENT} />
+
+    <SourceNote date="2026년 9월" sources={["행정안전부 지방세특례제한법(생애최초 주택 취득세 감면)"]} />
 
   <Faq items={faqs} />
 

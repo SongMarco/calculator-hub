@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -136,6 +137,8 @@ const faqs = [
       <li>환급금은 보통 다음 해 2월 급여에 반영됩니다.</li>
     </ul>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["국세청 연말정산 안내"]} />
 
   <Faq items={faqs} />
   <GovSupport page="yearend-tax" />

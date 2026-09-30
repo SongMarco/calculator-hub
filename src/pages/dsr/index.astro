@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -152,6 +153,8 @@ const faqs = [
     </table></div>
     <div class="example-box"><strong>💡 예시로 이해하기</strong><br>연봉 5,000만원인 차주가 금리 연 4%·30년 만기 변동금리로 주담대를 받는다면, 스트레스 DSR(3.0%p 가산) 적용 전 한도는 약 2억 9,400만원이지만 적용 후에는 약 2억 5,100만원으로 약 4,300만원 줄어듭니다. (금리·은행별 심사 기준에 따라 달라질 수 있는 추정치입니다)</div>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["금융위원회 스트레스 DSR 안내"]} />
 
   <Faq items={faqs} />
 

@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -144,6 +145,8 @@ const faqs = [
       <li>신규 계약은 당사자 합의가 우선하므로 시장 전환율이 상한보다 높을 수 있습니다</li>
     </ul>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["국토교통부 주택임대차보호법(전월세 전환율) 안내"]} />
 
   <Faq items={faqs} />
   <GovSupport page="rent-conversion" />

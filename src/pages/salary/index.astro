@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -296,6 +297,8 @@ const faqs = [
   </section>
 
   <AdSlot slotId={AD_SLOTS.IN_CONTENT} />
+
+    <SourceNote date="2026년 9월" sources={["국세청 근로소득 간이세액표", "국민연금공단·국민건강보험공단 고시 요율"]} />
 
   <Faq items={faqs} />
 

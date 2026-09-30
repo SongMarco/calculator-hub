@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
 import { faqJsonLd, pageUrl } from '../../lib/seo.js';
@@ -198,6 +199,8 @@ const faqs = [
       <li>수수료·세금은 이 계산에 포함되지 않습니다. 실제 매매 시 증권사 수수료와 양도소득세(해당 시)를 별도로 고려하세요.</li>
     </ul>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["단순 산술 계산(수수료·세금 제외)"]} />
 
   <Faq items={faqs} />
 

@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -129,6 +130,8 @@ const faqs = [
       <li>수급 개시 후에는 매년 물가변동률만큼 연금액이 조정됩니다.</li>
     </ul>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["국민연금공단"]} />
 
   <Faq items={faqs} />
   <GovSupport page="national-pension" />

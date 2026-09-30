@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -140,6 +141,8 @@ const faqs = [
     </ul>
     <div class="example-box"><strong>💡 예시로 이해하기</strong><br>월세 60만원·총급여 5,000만원인 직장인이 1년 내내 월세를 냈다면, 연간 월세 720만원 × 17% = 약 122만원을 세액공제받습니다. 월세 100만원이라면 연간 1,200만원 중 한도 1,000만원까지만 인정돼 17% × 1,000만원 = 최대 170만원입니다.</div>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["국세청 연말정산 월세 세액공제 안내"]} />
 
   <Faq items={faqs} />
 

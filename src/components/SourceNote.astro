@@ -1,0 +1,8 @@
+---
+interface Props {
+  date: string;      // 기준일 (예: "2026년 9월")
+  sources: string[]; // 출처 목록
+}
+const { date, sources } = Astro.props;
+---
+<p class="source-note">📅 기준일: {date} · 출처: {sources.join(', ')}</p>

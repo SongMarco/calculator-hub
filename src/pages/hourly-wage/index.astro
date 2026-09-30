@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -127,6 +128,8 @@ const faqs = [
     </ul>
     <div class="example-box"><strong>💡 예시로 이해하기</strong><br>주 20시간(하루 4시간 × 주 5일) 일하는 알바생이라면 주휴시간은 (20 ÷ 40) × 8 = 4시간, 주휴수당은 4시간 × 10,320원 = 41,280원입니다. 월 환산 시 세전 월급은 약 107만원이 됩니다. 주휴수당이 빠지면 약 90만원이니 월 18만원 차이가 납니다.</div>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["고용노동부 최저임금 고시(2026년 10,320원)"]} />
 
   <Faq items={faqs} />
 

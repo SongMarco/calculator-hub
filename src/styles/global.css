@@ -533,3 +533,7 @@ img { max-width: 100%; }
 .viz-bar .seg-tax { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
 .viz-bar .legend { display: flex; gap: 16px; margin-top: 8px; font-size: .85rem; color: var(--muted); }
 .viz-bar .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }
+.source-note { font-size: 13px; color: #6b7280; background: #f8fafc; border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 14px; margin: 18px 0; line-height: 1.7; }
+.foot-links { margin-top: 8px; font-size: 13px; }
+.foot-links a { color: #9aa1ad; text-decoration: none; }
+.foot-links a:hover { text-decoration: underline; }

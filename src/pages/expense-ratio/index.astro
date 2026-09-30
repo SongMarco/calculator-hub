@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -158,6 +159,8 @@ const faqs = [
     </ul>
     <p class="note">당해연도 수입이 복식부기 의무 기준(인적용역 7,500만원 등)을 넘으면 기준경비율이 적용됩니다.</p>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["국세청 단순경비율 고시"]} />
 
   <Faq items={faqs} />
 

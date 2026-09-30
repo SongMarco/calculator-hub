@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { u } from '../../lib/paths.js';
 import Faq from '../../components/Faq.astro';
+import SourceNote from '../../components/SourceNote.astro';
 import GovSupport from '../../components/GovSupport.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { AD_SLOTS } from '../../lib/ads.js';
@@ -149,6 +150,8 @@ const faqs = [
       <li>이 계산기는 3개월을 13주로 추정한 값이라 실제와 수만 원 차이 날 수 있습니다. 정확한 금액은 급여명세서의 세전 임금 총액을 기준으로 퇴직금 계산기에서 다시 계산해 보세요.</li>
     </ul>
   </section>
+
+    <SourceNote date="2026년 9월" sources={["고용노동부 퇴직급여·주휴수당 안내"]} />
 
   <Faq items={faqs} />
 
