@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 
 export const SITE_URL = process.env.SITE_URL || 'https://calc.choronglight.com';
 export const AUDIENCE_NAME = 'calc-hub-welfare';
-export const FROM = '계산기허브 뉴스레터 <news@calc.choronglight.com>';
+export const FROM = '계산기허브 뉴스레터 <news@news.calc.choronglight.com>';
 const RESEND_BASE = 'https://api.resend.com';
 
 export const BRACKETS = {
@@ -104,7 +104,7 @@ border-radius:999px;text-decoration:none;font-weight:800}
 export function mailFooter() {
   return `<hr style="border:none;border-top:1px solid #e5e7eb;margin:28px 0 16px">
 <p style="font-size:12px;color:#9aa1ad;line-height:1.8;margin:0">
-발신자: 계산기허브 뉴스레터 &lt;news@calc.choronglight.com&gt;<br>
+발신자: 계산기허브 뉴스레터 &lt;news@news.calc.choronglight.com&gt;<br>
 본 메일은 calc.choronglight.com/welfare/ 에서 뉴스레터 구독을 신청하신 분께 발송되었습니다.<br>
 수신을 원치 않으시면 <a href="${SITE_URL}/welfare/unsubscribe/" style="color:#1d4ed8">여기에서 수신거부</a>할 수 있습니다.
 </p>`;
