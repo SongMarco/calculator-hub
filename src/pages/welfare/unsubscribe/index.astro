@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { u } from '../../../lib/paths.js';
+---
+<BaseLayout
+  title="뉴스레터 수신거부"
+  description="계산기허브 새 지원금 알림 뉴스레터 수신거부"
+  path="/welfare/unsubscribe/"
+>
+  <p class="breadcrumb"><a href={u("/")}>홈</a> &gt; <a href={u("/welfare/")}>정부 지원금 찾기</a> &gt; 수신거부</p>
+
+  <section class="calc" style="max-width:560px">
+    <h2>수신거부</h2>
+    <p class="nl-desc">구독 신청한 이메일 주소를 입력하면, 수신거부 확인 메일을 보내드립니다.<br />메일의 링크를 눌러야 해지가 완료됩니다.</p>
+    <form id="unsub-form" novalidate>
+      <div class="field">
+        <label for="unsub-email">이메일</label>
+        <input type="email" id="unsub-email" required placeholder="example@email.com" autocomplete="email" />
+      </div>
+      <button type="submit" class="btn-welfare" id="unsub-submit">수신거부 메일 받기</button>
+      <p class="nl-msg" id="unsub-msg" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <script>
+    (function () {
+      const API = 'https://calc.choronglight.com/api/unsubscribe-request';
+      const form = document.getElementById('unsub-form');
+      const msg = document.getElementById('unsub-msg');
+      const btn = document.getElementById('unsub-submit');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('unsub-email').value.trim();
+        if (!email) { msg.textContent = '이메일을 입력해주세요.'; msg.className = 'nl-msg err'; return; }
+        btn.disabled = true;
+        btn.textContent = '발송 중…';
+        try {
+          const r = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+          });
+          const j = await r.json();
+          msg.textContent = (j.ok ? '✅ ' : '❌ ') + j.message;
+          msg.className = 'nl-msg ' + (j.ok ? 'ok' : 'err');
+        } catch {
+          msg.textContent = '❌ 네트워크 오류가 발생했습니다.';
+          msg.className = 'nl-msg err';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '수신거부 메일 받기';
+        }
+      });
+    })();
+  </script>
+</BaseLayout>
