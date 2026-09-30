@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   calcSalary, calcPension, calcHealth, calcLongTermCare, calcEmployment,
-  earnedIncomeDeduction, baseTax, earnedTaxCreditLimit, cut10, RATES_2026,
+  earnedIncomeDeduction, baseTax, earnedTaxCreditLimit, cut10, RATES_2026, topPercentile, reverseSalary,
 } from '../src/lib/salary.js';
 
 test('2026년 요율 상수', () => {
@@ -61,4 +61,20 @@ test('엣지 케이스', () => {
   assert.equal(zero.insuranceMonthly, 0);
   const neg = calcSalary({ annualSalary: -100 });
   assert.equal(neg.netMonthly, 0);
+});
+
+test('상위 퍼센타일 추정치', () => {
+  assert.equal(topPercentile(5000), 36);
+  assert.equal(topPercentile(10000), 7);
+  assert.equal(topPercentile(3000), 62);
+  assert.equal(topPercentile(6000), 29);
+  assert.equal(topPercentile(0), 100);
+  assert.ok(topPercentile(4000) > topPercentile(5000));
+});
+
+test('역계산: 목표 실수령액 → 필요 연봉', () => {
+  const rev = reverseSalary(3_541_087, 200_000, 1);
+  assert.ok(Math.abs(rev - 50_000_000) / 50_000_000 < 0.01);
+  const check = calcSalary({ annualSalary: rev, nonTaxableMonthly: 200_000, dependents: 1 });
+  assert.ok(Math.abs(check.netMonthly - 3_541_087) < 100);
 });

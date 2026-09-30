@@ -151,3 +151,54 @@ export function calcSalary({ annualSalary, nonTaxableMonthly = 200_000, dependen
     netAnnual: Math.round(netMonthly * 12),
   };
 }
+
+/**
+ * 연봉 상위 퍼센타일 추정치 ("상위 X%")
+ *
+ * 2024년 귀속 국세청 연말정산 신고현황 기반 근로소득 구간 분포 (대략치):
+ * 1억원 이상 7% / 7천~1억원 14% / 5천~7천만원 15% / 3천~5천만원 26% / 3천만원 미만 38%
+ * 구간 내에서는 균등 분포로 가정해 선형 보간. 참고용 추정치.
+ *
+ * @param {number} annualManwon 연봉 (만원)
+ * @returns {number} 상위 퍼센트 (0~100)
+ */
+const INCOME_BRACKETS = [
+  { lower: 0, upper: 3000, share: 38 },
+  { lower: 3000, upper: 5000, share: 26 },
+  { lower: 5000, upper: 7000, share: 15 },
+  { lower: 7000, upper: 10000, share: 14 },
+  { lower: 10000, upper: Infinity, share: 7 },
+];
+
+export function topPercentile(annualManwon) {
+  annualManwon = Math.max(0, annualManwon || 0);
+  let belowOrEqual = 0;
+  for (const b of INCOME_BRACKETS) {
+    if (annualManwon >= b.upper) {
+      belowOrEqual += b.share;
+      continue;
+    }
+    if (annualManwon > b.lower) {
+      belowOrEqual += (b.share * (annualManwon - b.lower)) / (b.upper - b.lower);
+    }
+    break;
+  }
+  return Math.min(100, Math.max(0, Math.round(100 - belowOrEqual)));
+}
+
+/**
+ * 목표 월 실수령액에 필요한 세전 연봉 역산 (이분 탐색)
+ * calcSalary가 단조증가 함수임을 이용. 50회 반복으로 원 단위 수렴.
+ */
+export function reverseSalary(targetNetMonthly, nonTaxableMonthly = 0, dependents = 1) {
+  targetNetMonthly = Math.max(0, targetNetMonthly || 0);
+  let lo = 0;
+  let hi = Math.max(targetNetMonthly * 24, 10_000_000);
+  for (let i = 0; i < 50; i++) {
+    const mid = (lo + hi) / 2;
+    const r = calcSalary({ annualSalary: mid, nonTaxableMonthly, dependents });
+    if (r.netMonthly < targetNetMonthly) lo = mid;
+    else hi = mid;
+  }
+  return Math.round((lo + hi) / 2);
+}

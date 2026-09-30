@@ -119,7 +119,7 @@
 - 연동: 허브 메인 카드, /salary/·/severance/ 관련 카드, docs/keywords.md #18 구현 표시, GovSupport는 severance 매핑 재사용.
 - 테스트 8개 추가 → 전체 107/107, 빌드 21페이지 (Vercel 루트·GH Pages /calculator-hub/ 둘 다 검증), sitemap 포함 확인.
 
-## 2026-09-30 10:50 KST — Wave 2 콘텐츠 보강 완료·푸시
+## 2026-09-30 09:50 KST — Wave 2 콘텐츠 보강 완료·푸시
 - 감사 에이전트 2명의 지적을 구현 에이전트 2명으로 반영 (17개 페이지):
   - [필수] 팩트 오류 2건 수정: national-pension FAQ "보험료 9%" → "9.5% (2026년 인상, 2033년까지 13%)", dsr 전세대출 FAQ "포함" → "원칙 제외" (+ article 표 행도 일치시킴)
   - [필수] freelancer thin content 보강 (FAQ 3개 + 예시), welfare FAQ 섹션 신설 (3개 + faqJsonLd 연결)
@@ -128,3 +128,27 @@
 - 예시 수치는 전부 계산기 lib 실측값으로 검증 후 반영 (감사 제안 중 salary 예시표·yearend-tax 수치가 실측과 달라 정정)
 - 모바일 UX: input 54개에 inputmode="decimal", .radio-row pill 스타일, article 표 table-scroll 래핑, salary 연봉 퀵버튼 (경쟁사 스윕 바로 적용 1순위)
 - 테스트 107/107, 빌드 21페이지 (Vercel 루트·GH Pages /calculator-hub/ 둘 다 검증), sitemap 포함
+
+## 2026-09-30 09:55 KST — Wave 2 차별화 기능 (salary 고도화) 완료·푸시
+- 경쟁사 스윕 "우리가 이길 포인트" 중 즉시 적용 가능한 것들을 salary 페이지에 구현:
+  1. 연봉 퀵버튼 (3,000만~1억원 칩, 클릭 즉시 자동 계산)
+  2. 결과 항목별 ? 툴팁 (공제 항목 한줄 설명, 모바일 탭 대응)
+  3. 결과 링크 복사 (입력값 URL 인코딩 → 카톡 공유, 접속 시 자동 복원·계산)
+  4. "상위 X%" 해석 (topPercentile: 2024년 귀속 국세청 연말정산 통계 기반, lib + 테스트)
+  5. 공제 구성 도넛 차트 (경량 SVG, 라이브러리 없음)
+  6. 세후→세전 역계산 모드 (reverseSalary 이분탐색, lib + 테스트, "월 300만원 받으려면 연봉 약 4,146만원" 검증)
+- 테스트 109/109, 빌드 21페이지 양쪽 base 검증.
+
+## 2026-09-30 10:00 KST — Wave 2 최종 요약 (마감 14:00)
+### 성과
+- 계산기 16종 → 17종 (알바 퇴직금 /parttime-severance/ 신규)
+- 17개 페이지 전수 콘텐츠 감사 → FAQ 40+개·예시 박스 17개 추가, 팩트 오류 2건 수정 (national-pension 9.5%, dsr 전세대출, first-home-tax 농특세 계산 로직)
+- 광고: 실슬롯 ID 상수화(src/lib/ads.js) + AdSlot 컴포넌트, 페이지당 1~2개 절제 배치, 플레이스홀더 전부 제거
+- 모바일 UX: inputmode 54개, radio pill, 표 스크롤 래핑
+- 차별화: 퀵버튼·툴팁·공유링크·상위%·도넛차트·역계산 (salary)
+### 검증
+- 테스트 109/109, 빌드 21페이지 (Vercel 루트·GH Pages /calculator-hub/ 둘 다)
+- sitemap 20 URL, AdSense 스크립트 전 페이지 유지
+### Wave 3 후보 (경쟁사 스윕 Top 7 중 대형)
+- 시나리오 비교 (A vs B), 결과 공유 확장 (전 페이지), 그래프 시각화 확대, 스트레스 DSR 규제 반영 자동화
+- ⚠️ marco/AdSense 직접 처리: 앵커+바이넷 포맷 OFF 권장 (자동 광고와 수동 배치 과밀 방지)

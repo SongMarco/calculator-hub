@@ -36,6 +36,10 @@ const faqs = [
     q: '연봉 5,000만원이면 월 실수령액은 얼마인가요?',
     a: '2026년 기준, 월 비과세 20만원·부양가족 본인 1명 조건에서 월 약 354만원 수준입니다. 연봉 3,000만원은 약 223만원, 4,000만원은 약 291만원, 7,000만원은 약 480만원입니다. 조건에 따라 달라지니 위 계산기에 본인 조건을 넣어 확인해 보세요.',
   },
+  {
+    q: '월 300만원 받으려면 연봉이 얼마여야 하나요?',
+    a: '위 계산기의 "세후 → 세전" 탭을 누르고 목표 월 실수령액을 입력하세요. 월 300만원(비과세 20만원·부양가족 1명 기준)을 받으려면 세전 연봉 약 4,100만원이 필요합니다. 4대보험과 세금을 역산한 추정치입니다.',
+  },
 ];
 ---
 <BaseLayout
@@ -53,8 +57,12 @@ const faqs = [
 
   <section class="calc">
     <h2>🧮 계산하기</h2>
+    <div class="mode-toggle" id="mode-toggle" aria-label="계산 방향 선택">
+      <button type="button" data-mode="fwd" class="active">세전 → 세후</button>
+      <button type="button" data-mode="rev">세후 → 세전</button>
+    </div>
     <div class="field">
-      <label for="annual">세전 연봉 (만원)</label>
+      <label for="annual" id="annual-label">세전 연봉 (만원)</label>
       <div class="chips" id="salary-chips">
         <button type="button" data-v="3000">3,000만원</button>
         <button type="button" data-v="4000">4,000만원</button>
@@ -63,7 +71,7 @@ const faqs = [
         <button type="button" data-v="10000">1억원</button>
       </div>
       <input id="annual" type="number" inputmode="decimal" value="5000" min="0" />
-      <div class="hint">상여금 포함 연간 총액 기준</div>
+      <div class="hint" id="annual-hint">상여금 포함 연간 총액 기준</div>
     </div>
     <div class="field">
       <label for="nontax">월 비과세액 (만원)</label>
@@ -77,17 +85,24 @@ const faqs = [
     <button class="btn" id="calc-btn">실수령액 계산하기</button>
 
     <div class="result" id="result">
-      <div>월 실수령액 (추정)</div>
+      <div id="r-title">월 실수령액 (추정)</div>
       <div class="big" id="r-net">-</div>
+      <p class="percentile" id="r-pct"></p>
+      <div class="donut-wrap">
+        <svg viewBox="0 0 120 120" class="donut" id="r-donut" role="img" aria-label="공제 항목별 비중 차트"></svg>
+        <div class="donut-legend" id="r-legend"></div>
+      </div>
       <table>
         <tr><th>항목</th><th>금액 (월)</th></tr>
         <tr><td>세전 월급</td><td id="r-monthly">-</td></tr>
-        <tr><td>국민연금 (4.75%)</td><td id="r-pension">-</td></tr>
-        <tr><td>건강보험 (3.595%)</td><td id="r-health">-</td></tr>
-        <tr><td>장기요양보험</td><td id="r-ltc">-</td></tr>
-        <tr><td>고용보험 (0.9%)</td><td id="r-employment">-</td></tr>
-        <tr><td>소득세 + 지방소득세</td><td id="r-tax">-</td></tr>
+        <tr><td>국민연금 (4.75%) <button type="button" class="q-tip" data-tip="월급의 4.75%를 본인이 부담 (회사가 같은 금액을 추가로 냄)" aria-label="국민연금 설명">?</button></td><td id="r-pension">-</td></tr>
+        <tr><td>건강보험 (3.595%) <button type="button" class="q-tip" data-tip="월급의 3.595%를 본인이 부담 (회사가 같은 금액을 추가로 냄)" aria-label="건강보험 설명">?</button></td><td id="r-health">-</td></tr>
+        <tr><td>장기요양보험 <button type="button" class="q-tip" data-tip="건강보험료의 13.14%. 65세 이상 장기요양 재원으로 쓰임" aria-label="장기요양보험 설명">?</button></td><td id="r-ltc">-</td></tr>
+        <tr><td>고용보험 (0.9%) <button type="button" class="q-tip" data-tip="월급의 0.9%를 본인이 부담. 실업급여·육아휴직급여의 재원" aria-label="고용보험 설명">?</button></td><td id="r-employment">-</td></tr>
+        <tr><td>소득세 + 지방소득세 <button type="button" class="q-tip" data-tip="근로소득공제·인적공제를 뺀 과세표준에 6~45% 누진세율 적용, 지방소득세는 소득세의 10%" aria-label="소득세 설명">?</button></td><td id="r-tax">-</td></tr>
       </table>
+      <button type="button" class="btn-share" id="share-btn">🔗 결과 링크 복사</button>
+      <p class="share-msg" id="share-msg" role="status"></p>
       <p class="note">연간 세액을 12로 나눈 추정치로, 실제 월 원천징수액(간이세액표 기준)과 다를 수 있습니다.</p>
     </div>
   </section>
@@ -95,17 +110,74 @@ const faqs = [
   <AdSlot slotId={AD_SLOTS.RESULT_BOTTOM} />
 
   <script>
-    import { calcSalary } from '../../lib/salary.js';
+    import { calcSalary, topPercentile, reverseSalary } from '../../lib/salary.js';
     const $ = (id) => document.getElementById(id);
     const fmt = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
     const num = (id) => parseFloat($(id).value.replace(/,/g, '')) || 0;
+
+    // 계산 방향 모드: fwd(세전→세후) / rev(세후→세전)
+    let mode = 'fwd';
+    const FWD_CHIPS = [[3000, '3,000만원'], [4000, '4,000만원'], [5000, '5,000만원'], [7000, '7,000만원'], [10000, '1억원']];
+    const REV_CHIPS = [[200, '월 200만원'], [250, '월 250만원'], [300, '월 300만원'], [400, '월 400만원'], [500, '월 500만원']];
+    const renderChips = () => {
+      const chips = mode === 'fwd' ? FWD_CHIPS : REV_CHIPS;
+      $('salary-chips').innerHTML = chips.map(([v, label], i) =>
+        `<button type="button" data-v="${v}"${i === 2 ? ' class="active"' : ''}>${label}</button>`).join('');
+      $('annual').value = chips[2][0];
+    };
+    const setMode = (m) => {
+      mode = m;
+      document.querySelectorAll('#mode-toggle button').forEach((b) =>
+        b.classList.toggle('active', b.dataset.mode === m));
+      $('annual-label').textContent = m === 'fwd' ? '세전 연봉 (만원)' : '목표 월 실수령액 (만원)';
+      $('annual-hint').textContent = m === 'fwd' ? '상여금 포함 연간 총액 기준' : '세후로 받고 싶은 월급 기준';
+      $('calc-btn').textContent = m === 'fwd' ? '실수령액 계산하기' : '필요 연봉 계산하기';
+      $('r-title').textContent = m === 'fwd' ? '월 실수령액 (추정)' : '필요 연봉 (추정)';
+      renderChips();
+      $('result').classList.remove('show');
+    };
+    $('mode-toggle').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-mode]');
+      if (btn && btn.dataset.mode !== mode) setMode(btn.dataset.mode);
+    });
+
     const runCalc = () => {
-      const r = calcSalary({
-        annualSalary: num('annual') * 10000,
-        nonTaxableMonthly: num('nontax') * 10000,
-        dependents: Math.max(1, Math.floor(num('dependents'))),
-      });
-      $('r-net').textContent = fmt(r.netMonthly);
+      const nontax = num('nontax') * 10000;
+      const dep = Math.max(1, Math.floor(num('dependents')));
+      let annualMan; // 만원 단위 연봉
+      if (mode === 'fwd') {
+        annualMan = num('annual');
+      } else {
+        annualMan = reverseSalary(num('annual') * 10000, nontax, dep) / 10000;
+      }
+      const r = calcSalary({ annualSalary: annualMan * 10000, nonTaxableMonthly: nontax, dependents: dep });
+      $('r-net').textContent = mode === 'fwd'
+        ? fmt(r.netMonthly)
+        : '약 ' + Math.round(annualMan).toLocaleString('ko-KR') + '만원';
+      const pct = topPercentile(annualMan);
+      $('r-pct').innerHTML =
+        `📊 연봉 <strong>${Math.round(annualMan).toLocaleString('ko-KR')}만원</strong>은 근로소득자 중 <strong>상위 약 ${pct}%</strong> 수준이에요` +
+        ` <span class="pct-src">(2024년 귀속 국세청 연말정산 통계 기반 추정치)</span>`;
+      // 공제 구성 도넛 차트 (경량 SVG)
+      const donutItems = [
+        { label: '국민연금', value: r.pension, color: '#2563eb' },
+        { label: '건강보험', value: r.health, color: '#34d399' },
+        { label: '장기요양', value: r.longTermCare, color: '#a78bfa' },
+        { label: '고용보험', value: r.employment, color: '#fbbf24' },
+        { label: '소득세 등', value: r.taxMonthly, color: '#f87171' },
+      ];
+      const dTotal = donutItems.reduce((s, x) => s + x.value, 0) || 1;
+      const RC = 2 * Math.PI * 54;
+      let acc = 0;
+      $('r-donut').innerHTML = donutItems.map((it) => {
+        const len = (it.value / dTotal) * RC;
+        const s = `<circle cx="60" cy="60" r="54" fill="none" stroke="${it.color}" stroke-width="18" stroke-dasharray="${len.toFixed(1)} ${(RC - len).toFixed(1)}" stroke-dashoffset="${(-acc).toFixed(1)}" transform="rotate(-90 60 60)"/>`;
+        acc += len;
+        return s;
+      }).join('');
+      $('r-legend').innerHTML = '<strong>💸 떼이는 돈 구성</strong>' + donutItems.map((it) =>
+        `<span><i style="background:${it.color}"></i>${it.label} ${Math.round((it.value / dTotal) * 100)}%</span>`
+      ).join('');
       $('r-monthly').textContent = fmt(r.monthly);
       $('r-pension').textContent = fmt(r.pension);
       $('r-health').textContent = fmt(r.health);
@@ -124,6 +196,40 @@ const faqs = [
       $('annual').value = btn.dataset.v;
       runCalc();
     });
+    // 결과 링크 복사: 입력값을 URL에 담아 공유
+    $('share-btn').addEventListener('click', async () => {
+      const url = new URL(location.href.split('?')[0]);
+      url.searchParams.set('mode', mode);
+      url.searchParams.set('annual', num('annual'));
+      url.searchParams.set('nontax', num('nontax'));
+      url.searchParams.set('dependents', Math.max(1, Math.floor(num('dependents'))));
+      const msg = $('share-msg');
+      try {
+        await navigator.clipboard.writeText(url.toString());
+        msg.textContent = '✅ 링크가 복사됐어요. 카톡·문자로 공유해 보세요!';
+      } catch {
+        msg.textContent = '복사에 실패했어요. 주소창의 URL을 직접 복사해 주세요.';
+      }
+      setTimeout(() => { msg.textContent = ''; }, 4000);
+    });
+    // ? 툴팁: 탭/클릭으로 설명 토글 (모바일 대응)
+    document.querySelectorAll('.q-tip').forEach((tip) => {
+      tip.addEventListener('click', () => tip.classList.toggle('open'));
+    });
+    // 공유 링크로 들어오면 입력값 복원 + 자동 계산
+    (() => {
+      const q = new URLSearchParams(location.search);
+      if (q.get('mode') === 'rev') setMode('rev');
+      if (!q.get('annual')) return;
+      if (q.get('annual')) $('annual').value = q.get('annual');
+      if (q.get('nontax')) $('nontax').value = q.get('nontax');
+      if (q.get('dependents')) $('dependents').value = q.get('dependents');
+      document.querySelectorAll('#salary-chips button').forEach((b) =>
+        b.classList.toggle('active', b.dataset.v === String(Math.floor(num('annual'))))
+      );
+      runCalc();
+      $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    })();
   </script>
 
   <section class="article">
