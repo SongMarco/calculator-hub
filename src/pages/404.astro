@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { u } from '../lib/paths.js';
+---
+<BaseLayout
+  title="페이지를 찾을 수 없습니다"
+  description="요청하신 페이지가 없습니다. 계산기허브의 계산기 목록에서 원하는 계산기를 찾아보세요."
+  path="/404/"
+  noindex
+>
+  <section class="article" style="text-align:center;padding:60px 20px">
+    <div style="font-size:64px;margin-bottom:16px">🧮</div>
+    <h1 class="page-title">페이지를 찾을 수 없어요</h1>
+    <p class="page-desc">주소가 바뀌었거나 삭제된 페이지입니다.<br />아래에서 원하는 계산기를 찾아보세요.</p>
+    <div style="margin-top:28px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a class="btn" href={u("/")}>홈으로 가기</a>
+      <a class="btn-outline-light" href={u("/welfare/")} style="color:#1d4ed8;border-color:#1d4ed8">💰 정부 지원금 찾기</a>
+    </div>
+    <div class="grid" style="margin-top:36px;text-align:left">
+      <a class="card" href={u("/salary/")}><h3>연봉 실수령액 계산기</h3><p>2026년 최신 요율</p></a>
+      <a class="card" href={u("/refund33/")}><h3>3.3% 환급금 계산기</h3><p>프리랜서 환급 미리보기</p></a>
+      <a class="card" href={u("/first-home-tax/")}><h3>생애최초 취득세 감면</h3><p>첫 집 세금 줄이기</p></a>
+    </div>
+  </section>
+</BaseLayout>

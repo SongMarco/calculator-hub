@@ -6,9 +6,10 @@ interface Props {
   path?: string;
   jsonLd?: Record<string, unknown>;
   ogImage?: string;
+  noindex?: boolean;
 }
 import { u } from '../lib/paths.js';
-const { title, description, keywords = '', path = '/', jsonLd } = Astro.props;
+const { title, description, keywords = '', path = '/', jsonLd, noindex = false } = Astro.props;
 const siteName = '계산기허브';
 const fullTitle = `${title} | ${siteName}`;
 // 정규 site URL: astro.config.mjs의 site (Vercel 빌드 → https://calc.choronglight.com, GH Pages 빌드 → songmarco.github.io/calculator-hub)
@@ -39,7 +40,7 @@ import '../styles/global.css';
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content={ogImageAbs} />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-  <meta name="robots" content="index, follow" />
+  <meta name="robots" content={noindex ? "noindex, follow" : "index, follow"} />
   {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8849084322770219" crossorigin="anonymous"></script>
