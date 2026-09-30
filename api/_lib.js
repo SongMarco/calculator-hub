@@ -40,8 +40,13 @@ export async function getAudienceId() {
   if (!r.ok) throw new Error('audiences 조회 실패');
   const j = await r.json();
   const found = (j.data || []).find((a) => a.name === AUDIENCE_NAME);
-  if (!found) throw new Error('audience 미생성: scripts/create-audience.mjs 실행 필요');
-  return found.id;
+  if (found) return found.id;
+  // Resend 대시보드에는 audience 생성 UI가 없으므로(API 전용) 없으면 자동 생성
+  const cr = await resend('/audiences', { method: 'POST', body: { name: AUDIENCE_NAME } });
+  if (!cr.ok) throw new Error(`audience 생성 실패: ${cr.status}`);
+  const created = await cr.json();
+  if (!created.id) throw new Error('audience 생성 응답에 id 없음');
+  return created.id;
 }
 
 export async function findContact(audienceId, email) {
