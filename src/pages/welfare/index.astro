@@ -366,8 +366,16 @@ const faqs = [
         shareBtn.textContent = '✅ 링크 복사됨';
         setTimeout(() => { shareBtn.textContent = '🔗 내 결과 공유하기'; }, 2000);
       };
+      const trackShare = () => {
+        try {
+          if (typeof gtag === 'function') {
+            gtag('event', 'share', { method: 'copy_link', content_type: 'welfare', item_id: location.pathname });
+          }
+        } catch (_) {}
+      };
       try {
         await navigator.clipboard.writeText(url);
+        trackShare();
         done();
       } catch (_) {
         prompt('아래 링크를 복사하세요', url);

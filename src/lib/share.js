@@ -77,6 +77,25 @@ function domFields(scope, skipIds) {
 }
 
 /**
+ * GA4 공유 이벤트 전송.
+ * gtag가 없는 환경(광고 차단 등)에서도 에러 없이 무시된다.
+ * 전송 실패가 공유 기능 자체를 막지 않도록 try/catch로 감싼다.
+ */
+export function trackShare(contentType, itemId) {
+  try {
+    if (typeof gtag === 'function') {
+      gtag('event', 'share', {
+        method: 'copy_link',
+        content_type: contentType,
+        item_id: itemId || (typeof location !== 'undefined' ? location.pathname : ''),
+      });
+    }
+  } catch (_) {
+    // 이벤트 전송 실패는 무시 — 공유 복사 동작에 영향을 주지 않는다
+  }
+}
+
+/**
  * 공유링크 초기화. 페이지 <script>에서 import 후 호출:
  *   import { initShareLink } from '../../lib/share.js';
  *   initShareLink();
@@ -101,6 +120,7 @@ export function initShareLink(options = {}) {
       const msg = $(msgId);
       try {
         await navigator.clipboard.writeText(url.toString());
+        trackShare('calculator', location.pathname);
         if (msg) msg.textContent = '✅ 링크가 복사됐어요. 카톡·문자로 공유해 보세요!';
       } catch {
         if (msg) msg.textContent = '복사에 실패했어요. 주소창의 URL을 직접 복사해 주세요.';

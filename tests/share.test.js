@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readField, collectParams, applyParams } from '../src/lib/share.js';
+import { readField, collectParams, applyParams, trackShare } from '../src/lib/share.js';
 
 // 가짜 필드 디스크립터 (DOM 없이 get/set 동작 검증)
 function textField(key, initial = '') {
@@ -76,4 +76,32 @@ test('round-trip: collect → apply 복원', () => {
   assert.equal(dst[0].get(), '6500');
   assert.equal(dst[1]._is(), true);
   assert.equal(dst[2].get(), 'y');
+});
+
+test('trackShare: gtag 목업으로 share 이벤트 전송', () => {
+  const calls = [];
+  globalThis.gtag = (...args) => { calls.push(args); };
+  try {
+    trackShare('calculator', '/salary/');
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0][0], 'event');
+    assert.equal(calls[0][1], 'share');
+    assert.deepEqual(calls[0][2], { method: 'copy_link', content_type: 'calculator', item_id: '/salary/' });
+  } finally {
+    delete globalThis.gtag;
+  }
+});
+
+test('trackShare: gtag이 없으면 에러 없이 무시', () => {
+  delete globalThis.gtag;
+  assert.doesNotThrow(() => trackShare('welfare', '/welfare/'));
+});
+
+test('trackShare: gtag이 예외를 던져도 공유 동작에 영향 없음', () => {
+  globalThis.gtag = () => { throw new Error('blocked'); };
+  try {
+    assert.doesNotThrow(() => trackShare('calculator', '/salary/'));
+  } finally {
+    delete globalThis.gtag;
+  }
 });
